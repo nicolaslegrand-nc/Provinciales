@@ -467,9 +467,10 @@ function getConfig() {
 function buildJS(cfg) {
   const visibleJS = `var PROVINCES_VISIBLES={sud:${cfg.visible.sud},nord:${cfg.visible.nord},iles:${cfg.visible.iles}};`;
   const participationJS = `var PARTICIPATION={"sud":${cfg.participation.sud},"nord":${cfg.participation.nord},"iles":${cfg.participation.iles}};`;
-  const vl = prov => Object.entries(cfg.voix[prov]).map(([n,v])=>`    '${n}': ${v}`).join(',\n');
+  const escName = n => n.replace(/'/g, "\\'");
+  const vl = prov => Object.entries(cfg.voix[prov]).map(([n,v])=>`    '${escName(n)}': ${v}`).join(',\n');
   const voixJS = `var VOIX_DATA={\n  'sud':{\n${vl('sud')}\n  },\n  'nord':{\n${vl('nord')}\n  },\n  'iles':{\n${vl('iles')}\n  }\n};`;
-  const sl = prov => Object.entries(cfg.sieges[prov]).map(([n,v])=>`    '${n}': ${v}`).join(',\n');
+  const sl = prov => Object.entries(cfg.sieges[prov]).map(([n,v])=>`    '${escName(n)}': ${v}`).join(',\n');
   const siegesJS = `var SIEGES_OVERRIDE={\n  'sud':{\n${sl('sud')}\n  },\n  'nord':{\n${sl('nord')}\n  },\n  'iles':{\n${sl('iles')}\n  }\n};`;
   return {visibleJS, participationJS, voixJS, siegesJS};
 }
