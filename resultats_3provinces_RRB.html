@@ -42,7 +42,7 @@
 .rrb-elus-inner{padding:8px 12px 10px!important;background:#f8faff!important;border-top:1px solid #e5e7eb!important;display:flex!important;flex-wrap:wrap!important;gap:6px!important;margin:0!important}
 .rrb-elu{display:flex!important;align-items:center!important;gap:5px!important;font-size:.73rem!important;color:#333!important;background:#fff!important;border:1px solid #e5e7eb!important;border-radius:20px!important;padding:3px 8px 3px 4px!important;margin:0!important}
 .rrb-elu-num{width:18px!important;height:18px!important;border-radius:50%!important;color:#fff!important;font-size:.6rem!important;font-weight:700!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;margin:0!important}
-.rrb-congres-badge{font-size:.55rem!important;font-weight:700!important;color:#92400e!important;background:#fef3c7!important;border:1px solid #f59e0b!important;border-radius:3px!important;padding:1px 4px!important;margin-left:4px!important;white-space:nowrap!important;flex-shrink:0!important}
+.rrb-congres-badge{font-size:.55rem!important;font-weight:700!important;color:#92400e!important;background:#fff3cc!important;border:1px solid #e8a000!important;border-radius:3px!important;padding:1px 4px!important;margin-left:4px!important;white-space:nowrap!important;flex-shrink:0!important}
 .rrb-footer{margin:28px 0 0!important;font-size:.65rem!important;color:#aaa!important;text-align:center!important;padding:12px 0 0!important;max-width:900px!important;width:100%!important;border-top:1px solid #d0d8f0!important;display:block!important}
 @media(max-width:600px){.rrb-tab{padding:10px 4px!important}.rrb-tl{font-size:.7rem!important}.rrb-tc{font-size:.58rem!important}.rrb-lr{gap:6px!important;padding:8px 10px!important}.rrb-lseat{font-size:1.1rem!important}}
 </style>
@@ -81,70 +81,12 @@
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
 var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
-var PARTICIPATION={"sud":0,"nord":0,"iles":0};
-var SIEGES_OVERRIDE={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 24,
-    'Nous, Réunis !': 0,
-    'Un espoir pour demain': 0,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 9,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 7,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 0
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 0,
-    'PALIKA Îles': 0,
-    'Nation Autochtone': 0,
-    'Union pour construire dans le consensus': 0,
-    'S\'engager et oeuvrer pour la prospérité': 0,
-    'Baselaia': 0,
-    'Un nouveau souffle': 0
-  }
-};
+var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
 var VOIX_DATA={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 24500,
-    'Nous, Réunis !': 5596,
-    'Un espoir pour demain': 2562,
-    'Pour une Calédonie française': 265,
-    'Unis pour le pays': 10200,
-    'France-Calédonie : une patrie': 666,
-    'Kanaky pour tous': 7300,
-    'Faire Pays': 2200,
-    'Souveraineté Kanaky NC': 50,
-    'Une province pour tous': 102,
-    'Un autre monde est possible !': 5236
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 0,
-    'PALIKA Îles': 0,
-    'Nation Autochtone': 0,
-    'Union pour construire dans le consensus': 0,
-    'S\'engager et oeuvrer pour la prospérité': 0,
-    'Baselaia': 0,
-    'Un nouveau souffle': 0
-  }
+  'sud':{'Les Loyalistes et le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
+  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
+  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
 };
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:111923,nord:41983,iles:22166};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -252,7 +194,7 @@ function attachSeatEvents(prov){
   svgEl.querySelectorAll('.rrb-seat').forEach(function(el){
     el.addEventListener('mouseenter',function(){
       var d=svgData[parseInt(this.getAttribute('data-i'))];
-      if(d)showElu(d.prov,d.elu,d.liste,d.col,d.seats);
+      if(d)showElu(d.prov,d.elu,d.liste,d.col,d.seats,d.isCong);
     });
     el.addEventListener('mouseleave',function(){
       var d=svgData[parseInt(this.getAttribute('data-i'))];
@@ -303,12 +245,10 @@ function renderSVG(prov){
     s+='<stop offset="100%" stop-color="#000000" stop-opacity="0.35"/></radialGradient></defs>';
     s+='<circle cx="'+x+'" cy="'+(Math.round((y+2)*10)/10)+'" r="12.5" fill="#00000030"/>';
     if(elu){
-      var congTxt=isCong?' ★ Congrès':'';
       var di=svgData.length;
-      svgData.push({prov:prov,elu:elu+congTxt,liste:liste,col:col,seats:seatCount});
+      svgData.push({prov:prov,elu:elu,isCong:isCong,liste:liste,col:col,seats:seatCount});
       s+='<circle cx="'+x+'" cy="'+y+'" r="12.5" fill="'+col+'" stroke="white" stroke-width="1.5" data-i="'+di+'" class="rrb-seat" style="cursor:pointer"/>';
       s+='<circle cx="'+x+'" cy="'+y+'" r="12.5" fill="url(#'+sid+')" style="pointer-events:none"/>';
-      if(isCong)s+='<text x="'+x+'" y="'+(y-6)+'" text-anchor="middle" font-size="8" fill="#f59e0b" style="pointer-events:none">★</text>';
     } else {
       s+='<circle cx="'+x+'" cy="'+y+'" r="12.5" fill="'+col+'" stroke="white" stroke-width="1.5"/>';
       s+='<circle cx="'+x+'" cy="'+y+'" r="12.5" fill="url(#'+sid+')" style="pointer-events:none"/>';
@@ -337,9 +277,11 @@ function renderSVG(prov){
   s+='<line x1="20" y1="'+(HH+44)+'" x2="'+(W-20)+'" y2="'+(HH+44)+'" stroke="#d0d8f0" stroke-width="1"/>';
   if(shown.length>0){shown.forEach(function(nom,idx){var c=idx%COLS,row=Math.floor(idx/COLS),fx=sx+c*CW,fy=HH+59+row*22,nm=nom.length>24?nom.substring(0,24)+'…':nom,col=COULEURS[prov][nom]||GREY,sv=sp[nom]||0;s+='<circle cx="'+(fx+7)+'" cy="'+(fy-4)+'" r="7" fill="'+col+'"/><text x="'+(fx+18)+'" y="'+fy+'" font-family="Arial,sans-serif" font-size="11" fill="#333">'+nm+' <tspan font-weight="900" fill="'+col+'">'+sv+'</tspan></text>';});}
   else{s+='<text x="'+CX+'" y="'+(HH+59)+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#bbb" font-style="italic">En attente des résultats</text>';}
-  s+='<rect id="ib_'+prov+'" x="10" y="10" width="400" height="60" rx="10" fill="#1a4dbf" opacity="0"/>';
+  s+='<rect id="ib_'+prov+'" x="10" y="10" width="400" height="78" rx="10" fill="#1a4dbf" opacity="0"/>';
   s+='<text id="it1_'+prov+'" x="210" y="36" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#fff" opacity="0"></text>';
-  s+='<text id="it2_'+prov+'" x="210" y="56" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="900" fill="#fff" opacity="0"></text>';
+  s+='<text id="it2_'+prov+'" x="210" y="58" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="900" fill="#fff" opacity="0"></text>';
+  s+='<rect id="ibadge_'+prov+'" x="170" y="66" width="80" height="16" rx="8" fill="#fff3cc" stroke="#e8a000" stroke-width="1" opacity="0"/>';
+  s+='<text id="itbadge_'+prov+'" x="210" y="77" text-anchor="middle" font-family="Arial,sans-serif" font-size="9.5" font-weight="900" fill="#92400e" opacity="0">★ Congrès</text>';
   var el=document.getElementById('svg-'+prov);
   el.setAttribute('viewBox','0 0 '+W+' '+HSVG);el.innerHTML=s;
   attachSeatEvents(prov);
@@ -388,19 +330,27 @@ function renderLegende(prov){
 function render(prov){renderSVG(prov);renderLegende(prov);}
 
 // ═══ INTERACTIONS ═══
-function showElu(prov,elu,liste,col,seats){
+function showElu(prov,elu,liste,col,seats,isCong){
   if(!elu)return;
   var ib=document.getElementById('ib_'+prov),it1=document.getElementById('it1_'+prov),it2=document.getElementById('it2_'+prov);
+  var ibadge=document.getElementById('ibadge_'+prov),itbadge=document.getElementById('itbadge_'+prov);
   if(!ib)return;
   ib.setAttribute('opacity','0.92');ib.setAttribute('fill',col);
   it1.textContent=liste.length>50?liste.substring(0,50)+'…':liste;it1.setAttribute('opacity','1');
   it2.textContent=elu;it2.setAttribute('opacity','1');
+  if(isCong){
+    ibadge.setAttribute('opacity','1');itbadge.setAttribute('opacity','1');
+  } else if(ibadge){
+    ibadge.setAttribute('opacity','0');itbadge.setAttribute('opacity','0');
+  }
   if(seats!==undefined) updateMajoBar(prov, seats, col, liste);
 }
 function hideElu(prov){
   var ib=document.getElementById('ib_'+prov),it1=document.getElementById('it1_'+prov),it2=document.getElementById('it2_'+prov);
+  var ibadge=document.getElementById('ibadge_'+prov),itbadge=document.getElementById('itbadge_'+prov);
   if(!ib)return;
   ib.setAttribute('opacity','0');it1.setAttribute('opacity','0');it2.setAttribute('opacity','0');
+  if(ibadge){ibadge.setAttribute('opacity','0');itbadge.setAttribute('opacity','0');}
   resetMajoBar(prov);
 }
 function updateMajoBar(prov, seats, col, liste){
