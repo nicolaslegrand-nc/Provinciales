@@ -196,6 +196,9 @@ tbody td{padding:5px 8px;vertical-align:middle}
     <button class="btn btn-reset" onclick="reinitialiserTout()" style="background:#fff;color:#c0392b;border:1px solid #e0a0a0">
       🗑️ Réinitialiser tout
     </button>
+    <button class="btn" onclick="loadPublishedFromGitHub(true)" style="background:#fff;color:#1a4dbf;border:1px solid #9bb8e8">
+      ↻ Recharger les valeurs publiées
+    </button>
   </div>
   <div class="progress" id="progress" style="display:none"></div>
   <div class="instructions">
@@ -749,6 +752,7 @@ function reinitialiserTout() {
   });
 
   document.getElementById('alerts-pub').innerHTML = `<div class="alert info">🗑️ Tous les champs ont été réinitialisés. Rien n'a été publié — clique sur "Publier" si tu veux appliquer la remise à zéro sur GitHub.</div>`;
+  saveDraft();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -820,8 +824,117 @@ function telechargerFichiers() {
 }
 
 // INIT
+// ═══════════════════════════════════════════════════════════
+// PERSISTANCE — anti-F5 (sauvegarde locale) + anti-vidage de cache (relecture GitHub)
+// ═══════════════════════════════════════════════════════════
+const DRAFT_KEY = 'rrb_saisie_draft_v1';
+
+function collectState() {
+  const st = {};
+  ['sud','nord','iles'].forEach(prov => {
+    st[prov] = {
+      visible: document.getElementById('visible-'+prov).checked,
+      exp: document.getElementById('exp-'+prov).value,
+      nul: document.getElementById('nul-'+prov).value,
+      blc: document.getElementById('blc-'+prov).value,
+      voix: {}, sieges: {}, over: {}
+    };
+    LISTES[prov].forEach((l,i) => {
+      st[prov].voix[i]   = document.getElementById(`voix-${prov}-${i}`).value;
+      st[prov].sieges[i] = document.getElementById(`siege-${prov}-${i}`).value;
+      st[prov].over[i]   = !!OVERRIDES[prov][i];
+    });
+  });
+  return st;
+}
+
+function saveDraft() {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(collectState())); } catch(e){}
+}
+
+function applyState(st) {
+  ['sud','nord','iles'].forEach(prov => {
+    const s = st[prov]; if (!s) return;
+    document.getElementById('exp-'+prov).value = s.exp||'';
+    document.getElementById('nul-'+prov).value = s.nul||'';
+    document.getElementById('blc-'+prov).value = s.blc||'';
+    document.getElementById('visible-'+prov).checked = !!s.visible;
+    LISTES[prov].forEach((l,i) => {
+      if (s.voix && s.voix[i]!==undefined) document.getElementById(`voix-${prov}-${i}`).value = s.voix[i];
+      OVERRIDES[prov][i] = s.over ? !!s.over[i] : false;
+      if (OVERRIDES[prov][i] && s.sieges && s.sieges[i]!==undefined)
+        document.getElementById(`siege-${prov}-${i}`).value = s.sieges[i];
+    });
+    onToggle(prov);
+    onVoixChange(prov);
+  });
+}
+
+function restoreDraft() {
+  let raw;
+  try { raw = localStorage.getItem(DRAFT_KEY); } catch(e){ return false; }
+  if (!raw) return false;
+  try { applyState(JSON.parse(raw)); return true; } catch(e){ return false; }
+}
+
+function parsePublished(html) {
+  function grab(re){ const m = html.match(re); return m ? m[0] : ''; }
+  const code = grab(/var PROVINCES_VISIBLES=\{[^}]+\};/) + '\n'
+             + grab(/var EXPRIMES=\{[^}]+\};/) + '\n'
+             + grab(/var VOIX_DATA=\{[\s\S]*?\n\};/) + '\n'
+             + 'return {PV:(typeof PROVINCES_VISIBLES!=="undefined")?PROVINCES_VISIBLES:null,'
+             + 'EX:(typeof EXPRIMES!=="undefined")?EXPRIMES:null,'
+             + 'VD:(typeof VOIX_DATA!=="undefined")?VOIX_DATA:null};';
+  try { return (new Function(code))(); } catch(e) { return null; }
+}
+
+async function fetchPublishedHTML(user, repo) {
+  for (const branch of ['main','master']) {
+    const url = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${FICHIERS.prov}?t=` + Date.now();
+    try {
+      const r = await fetch(url, {cache:'no-store'});
+      if (r.ok) return await r.text();
+    } catch(e) {}
+  }
+  return null;
+}
+
+async function loadPublishedFromGitHub(manuel) {
+  const user = (document.getElementById('gh-user').value.trim()) || 'nicolaslegrand-nc';
+  const repo = (document.getElementById('gh-repo-prov').value.trim()) || 'Provinciales';
+  const html = await fetchPublishedHTML(user, repo);
+  if (!html) { if (manuel) alert("Impossible de lire les valeurs publiées sur GitHub (réseau/CORS). La saisie reste possible manuellement."); return false; }
+  const data = parsePublished(html);
+  if (!data || !data.VD) { if (manuel) alert("Fichier publié illisible."); return false; }
+  ['sud','nord','iles'].forEach(prov => {
+    if (data.PV) document.getElementById('visible-'+prov).checked = !!data.PV[prov];
+    if (data.EX && data.EX[prov]!==undefined && data.EX[prov]>0) document.getElementById('exp-'+prov).value = data.EX[prov];
+    LISTES[prov].forEach((l,i) => {
+      const v = data.VD[prov] && data.VD[prov][l.nom];
+      document.getElementById(`voix-${prov}-${i}`).value = (v && v>0) ? v : '';
+      OVERRIDES[prov][i] = false;
+    });
+    onToggle(prov);
+    onVoixChange(prov);
+  });
+  saveDraft();
+  if (manuel) document.getElementById('alerts-pub').innerHTML = `<div class="alert info">↻ Valeurs rechargées depuis la dernière publication sur GitHub. (Les Nuls/Blancs ne sont pas stockés en ligne — à ressaisir si besoin pour la participation.)</div>`;
+  return true;
+}
+
+function autosaveSetup() {
+  let t;
+  const h = () => { clearTimeout(t); t = setTimeout(saveDraft, 400); };
+  document.addEventListener('input', h);
+  document.addEventListener('change', h);
+}
+
 ['sud','nord','iles'].forEach(initPanel);
 afficherDernierePublication();
+autosaveSetup();
+// Au chargement : un brouillon local (survit au F5) est prioritaire ;
+// sinon on relit les dernières valeurs publiées sur GitHub (survit au vidage de cache).
+if (!restoreDraft()) { loadPublishedFromGitHub(false); }
 </script>
 </body>
 </html>
