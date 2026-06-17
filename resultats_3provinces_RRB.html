@@ -81,12 +81,70 @@
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
 var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
-var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
-var VOIX_DATA={
-  'sud':{'Les Loyalistes et le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
-  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
-  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
+var PARTICIPATION={"sud":0,"nord":0,"iles":0};
+var SIEGES_OVERRIDE={
+  'sud':{
+    'Les Loyalistes et le Rassemblement': 21,
+    'Nous, Réunis !': 0,
+    'Un espoir pour demain': 0,
+    'Pour une Calédonie française': 0,
+    'Unis pour le pays': 9,
+    'France-Calédonie : une patrie': 0,
+    'Kanaky pour tous': 6,
+    'Faire Pays': 0,
+    'Souveraineté Kanaky NC': 0,
+    'Une province pour tous': 0,
+    'Un autre monde est possible !': 4
+  },
+  'nord':{
+    'UC-FLNKS': 0,
+    'UNI': 0,
+    'Alternative Nord pour un pays souverain': 0,
+    'Faire Pays': 0,
+    'Agissons ensemble pour le Nord': 0
+  },
+  'iles':{
+    'UC-FLNKS Îles': 0,
+    'PALIKA Îles': 0,
+    'Nation Autochtone': 0,
+    'Union pour construire dans le consensus': 0,
+    'S\'engager et oeuvrer pour la prospérité': 0,
+    'Baselaia': 0,
+    'Un nouveau souffle': 0
+  }
 };
+var VOIX_DATA={
+  'sud':{
+    'Les Loyalistes et le Rassemblement': 24500,
+    'Nous, Réunis !': 5596,
+    'Un espoir pour demain': 2654,
+    'Pour une Calédonie française': 256,
+    'Unis pour le pays': 10200,
+    'France-Calédonie : une patrie': 532,
+    'Kanaky pour tous': 7300,
+    'Faire Pays': 1203,
+    'Souveraineté Kanaky NC': 56,
+    'Une province pour tous': 1260,
+    'Un autre monde est possible !': 5598
+  },
+  'nord':{
+    'UC-FLNKS': 0,
+    'UNI': 0,
+    'Alternative Nord pour un pays souverain': 0,
+    'Faire Pays': 0,
+    'Agissons ensemble pour le Nord': 0
+  },
+  'iles':{
+    'UC-FLNKS Îles': 0,
+    'PALIKA Îles': 0,
+    'Nation Autochtone': 0,
+    'Union pour construire dans le consensus': 0,
+    'S\'engager et oeuvrer pour la prospérité': 0,
+    'Baselaia': 0,
+    'Un nouveau souffle': 0
+  }
+};
+
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:111923,nord:41983,iles:22166};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
