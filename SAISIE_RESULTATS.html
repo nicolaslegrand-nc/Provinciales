@@ -171,6 +171,12 @@ tbody td{padding:5px 8px;vertical-align:middle}
   <button class="tab-btn" onclick="switchTab('iles',this)">🟠 Îles Loyauté</button>
 </div>
 
+<div style="text-align:right;margin:8px 0">
+  <button onclick="remplirSimulationTest()" style="background:none;border:1px solid #ccc;color:#888;font-size:.72rem;padding:5px 10px;border-radius:6px;cursor:pointer">
+    🧪 Remplir avec des voix de test (3 provinces)
+  </button>
+</div>
+
 <div class="panel active" id="panel-sud"></div>
 <div class="panel" id="panel-nord"></div>
 <div class="panel" id="panel-iles"></div>
@@ -178,6 +184,7 @@ tbody td{padding:5px 8px;vertical-align:middle}
 <!-- ═══ PUBLICATION ═══ -->
 <div class="pub-section">
   <h2>🚀 Publier sur GitHub</h2>
+  <div id="last-publish-info" style="display:none;font-size:.85rem;color:#1a9e4a;font-weight:600;margin-bottom:10px"></div>
   <div id="alerts-pub"></div>
   <div class="pub-btns">
     <button class="btn btn-publish" id="btn-publish" onclick="publierSurGithub()">
@@ -185,6 +192,9 @@ tbody td{padding:5px 8px;vertical-align:middle}
     </button>
     <button class="btn btn-dl" onclick="telechargerFichiers()">
       ⬇️ Télécharger sans publier
+    </button>
+    <button class="btn btn-reset" onclick="reinitialiserTout()" style="background:#fff;color:#c0392b;border:1px solid #e0a0a0">
+      🗑️ Réinitialiser tout
     </button>
   </div>
   <div class="progress" id="progress" style="display:none"></div>
@@ -205,6 +215,21 @@ const FICHIERS = {
   prov: 'resultats_3provinces_RRB.html',
   cong: 'congres_RRB.html',
 };
+
+// Encodage/décodage UTF-8 base64 fiable (remplace escape/unescape dépréciés,
+// qui pouvaient corrompre les accents français lors de la publication)
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+function base64ToUtf8(b64) {
+  const binary = atob(b64.replace(/\n/g,''));
+  const bytes = new Uint8Array(binary.length);
+  for (let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
 
 const LISTES = {
   sud:[
@@ -239,6 +264,7 @@ const LISTES = {
 };
 
 const OVERRIDES = {sud:{}, nord:{}, iles:{}};
+const PARTICIPATION_CALC = {sud:0, nord:0, iles:0};
 
 // ═══════════════════════════════════════════════════════════
 // TOKEN
@@ -310,12 +336,27 @@ function initPanel(prov) {
   document.getElementById('panel-'+prov).innerHTML = `
     <div class="section">
       <h2>${labels[prov]}</h2>
+      <div class="row-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="field">
+          <label>Exprimés</label>
+          <input type="number" id="exp-${prov}" min="0" placeholder="ex: 75370"
+            oninput="onVoixChange('${prov}')">
+        </div>
+        <div class="field">
+          <label>Nuls</label>
+          <input type="number" id="nul-${prov}" min="0" placeholder="0"
+            oninput="onVoixChange('${prov}')">
+        </div>
+        <div class="field">
+          <label>Blancs</label>
+          <input type="number" id="blc-${prov}" min="0" placeholder="0"
+            oninput="onVoixChange('${prov}')">
+        </div>
+      </div>
       <div class="row-2">
         <div class="field">
-          <label>Participation (%)</label>
-          <input type="number" id="part-${prov}" min="0" max="100" step="0.1"
-            placeholder="ex: 67.3" oninput="onVoixChange('${prov}')">
-          <div class="hint">Inscrits : ${INSCRITS[prov].toLocaleString('fr-FR')} · Seuil : ${seuil.toLocaleString('fr-FR')} voix</div>
+          <div class="hint" style="margin-top:0">Inscrits : ${INSCRITS[prov].toLocaleString('fr-FR')} · Seuil : ${seuil.toLocaleString('fr-FR')} voix</div>
+          <div id="partcalc-${prov}" style="margin-top:6px;font-size:.85rem;font-weight:700;color:#1a4dbf"></div>
         </div>
         <div class="field">
           <label>Province visible dans l'infographie</label>
@@ -392,14 +433,36 @@ function onVoixChange(prov) {
 
   updateTotalSieges(prov);
 
-  // Stats participation
-  const part = parseFloat(document.getElementById('part-'+prov).value)||0;
-  const exprimés = part>0 ? Math.round(INSCRITS[prov]*part/100) : null;
-  const warn = exprimés && totalVoix>0 && Math.abs(totalVoix-exprimés)>exprimés*0.05;
+  // Stats participation calculée depuis Exprimés + Nuls + Blancs
+  const exprimes = parseInt(document.getElementById('exp-'+prov).value)||0;
+  const nuls = parseInt(document.getElementById('nul-'+prov).value)||0;
+  const blancs = parseInt(document.getElementById('blc-'+prov).value)||0;
+  const votants = exprimes + nuls + blancs;
+  const participation = votants>0 ? (votants/INSCRITS[prov]*100) : 0;
+
+  const partCalcDiv = document.getElementById('partcalc-'+prov);
+  if (votants>0) {
+    partCalcDiv.innerHTML = `Participation : ${participation.toFixed(2)} % &nbsp;<span style="color:#888;font-weight:400">(${votants.toLocaleString('fr-FR')} votants / ${INSCRITS[prov].toLocaleString('fr-FR')} inscrits)</span>`;
+  } else {
+    partCalcDiv.innerHTML = '';
+  }
+
+  const warn = exprimes>0 && totalVoix>0 && Math.abs(totalVoix-exprimes)>exprimes*0.03;
+  const match = exprimes>0 && totalVoix>0 && !warn;
+  const checkBadge = exprimes>0 && totalVoix>0
+    ? `<div class="stat ${match?'ok':'warn'}" style="grid-column:1/-1;font-size:1.1rem">
+        <div class="val" style="font-size:1.3rem">${match?'✓':'⚠️'} ${totalVoix.toLocaleString('fr-FR')} / ${exprimes.toLocaleString('fr-FR')}</div>
+        <div class="lbl">Voix saisies / Exprimés ${match?'— cohérent':'— à vérifier'}</div>
+      </div>`
+    : '';
   document.getElementById('stats-'+prov).innerHTML = `
-    <div class="stat ${warn?'warn':''}"><div class="val">${totalVoix.toLocaleString('fr-FR')}</div><div class="lbl">Total voix</div></div>
-    ${exprimés?`<div class="stat ${warn?'warn':'ok'}"><div class="val">${exprimés.toLocaleString('fr-FR')}</div><div class="lbl">Votants attendus (${part}%)</div></div>`:''}
-    ${warn?`<div class="alert warn" style="width:100%;margin-top:8px">⚠️ Écart important entre voix saisies et votants attendus — vérifier les chiffres.</div>`:''}`;
+    ${checkBadge}
+    <div class="stat ${warn?'warn':''}"><div class="val">${totalVoix.toLocaleString('fr-FR')}</div><div class="lbl">Total voix listes</div></div>
+    ${exprimes?`<div class="stat ${warn?'warn':'ok'}"><div class="val">${exprimes.toLocaleString('fr-FR')}</div><div class="lbl">Exprimés saisis</div></div>`:''}
+    ${warn?`<div class="alert warn" style="width:100%;margin-top:8px">⚠️ Le total des voix par liste (${totalVoix.toLocaleString('fr-FR')}) ne correspond pas aux Exprimés (${exprimes.toLocaleString('fr-FR')}) — vérifier la saisie.</div>`:''}`;
+
+  // Stocker la participation calculée pour la publication
+  PARTICIPATION_CALC[prov] = participation;
 }
 
 function onSiegeChange(prov, i) {
@@ -451,10 +514,11 @@ function switchTab(prov, btn) {
 // LIRE CONFIG
 // ═══════════════════════════════════════════════════════════
 function getConfig() {
-  const cfg = {visible:{},participation:{},voix:{},sieges:{}};
+  const cfg = {visible:{},participation:{},exprimes:{},voix:{},sieges:{}};
   ['sud','nord','iles'].forEach(prov => {
     cfg.visible[prov] = document.getElementById('visible-'+prov).checked;
-    cfg.participation[prov] = parseFloat(document.getElementById('part-'+prov).value)||0;
+    cfg.participation[prov] = PARTICIPATION_CALC[prov]||0;
+    cfg.exprimes[prov] = parseInt(document.getElementById('exp-'+prov).value)||0;
     cfg.voix[prov]={}; cfg.sieges[prov]={};
     LISTES[prov].forEach((l,i) => {
       cfg.voix[prov][l.nom] = parseInt(document.getElementById(`voix-${prov}-${i}`).value)||0;
@@ -467,17 +531,22 @@ function getConfig() {
 function buildJS(cfg) {
   const visibleJS = `var PROVINCES_VISIBLES={sud:${cfg.visible.sud},nord:${cfg.visible.nord},iles:${cfg.visible.iles}};`;
   const participationJS = `var PARTICIPATION={"sud":${cfg.participation.sud},"nord":${cfg.participation.nord},"iles":${cfg.participation.iles}};`;
+  const exprimesJS = `var EXPRIMES={sud:${cfg.exprimes.sud},nord:${cfg.exprimes.nord},iles:${cfg.exprimes.iles}};`;
   const escName = n => n.replace(/'/g, "\\'");
   const vl = prov => Object.entries(cfg.voix[prov]).map(([n,v])=>`    '${escName(n)}': ${v}`).join(',\n');
   const voixJS = `var VOIX_DATA={\n  'sud':{\n${vl('sud')}\n  },\n  'nord':{\n${vl('nord')}\n  },\n  'iles':{\n${vl('iles')}\n  }\n};`;
   const sl = prov => Object.entries(cfg.sieges[prov]).map(([n,v])=>`    '${escName(n)}': ${v}`).join(',\n');
   const siegesJS = `var SIEGES_OVERRIDE={\n  'sud':{\n${sl('sud')}\n  },\n  'nord':{\n${sl('nord')}\n  },\n  'iles':{\n${sl('iles')}\n  }\n};`;
-  return {visibleJS, participationJS, voixJS, siegesJS};
+  return {visibleJS, participationJS, exprimesJS, voixJS, siegesJS};
 }
 
 function injecterHTML(html, js) {
   html = html.replace(/var PROVINCES_VISIBLES=\{[^}]+\};/, js.visibleJS);
   html = html.replace(/var PARTICIPATION=\{[^}]+\};/, js.participationJS);
+  if (html.includes('var EXPRIMES='))
+    html = html.replace(/var EXPRIMES=\{[^}]+\};/, js.exprimesJS);
+  else
+    html = html.replace('var PARTICIPATION=', js.exprimesJS+'\nvar PARTICIPATION=');
   html = html.replace(/var VOIX_DATA=\{[\s\S]*?\n\};/, js.voixJS+'\n');
   if (html.includes('var SIEGES_OVERRIDE='))
     html = html.replace(/var SIEGES_OVERRIDE=\{[\s\S]*?\n\};/, js.siegesJS+'\n');
@@ -491,7 +560,17 @@ function injecterHTML(html, js) {
 // ═══════════════════════════════════════════════════════════
 async function githubGetFile(token, user, repo, fichier) {
   const url = `https://api.github.com/repos/${user}/${repo}/contents/${fichier}`;
-  const r = await fetch(url, {headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}});
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  let r;
+  try {
+    r = await fetch(url, {headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}, signal: controller.signal});
+  } catch(e) {
+    if (e.name === 'AbortError') throw new Error(`Connexion trop lente ou coupée lors de la lecture de ${fichier} — réessaie.`);
+    throw new Error(`Pas de connexion réseau lors de la lecture de ${fichier}.`);
+  } finally {
+    clearTimeout(timeoutId);
+  }
   if (!r.ok) throw new Error(`Impossible de lire ${fichier} sur ${repo} (${r.status})`);
   return r.json();
 }
@@ -500,14 +579,25 @@ async function githubPutFile(token, user, repo, fichier, contenu, sha) {
   const url = `https://api.github.com/repos/${user}/${repo}/contents/${fichier}`;
   const body = {
     message: `MAJ résultats ${new Date().toLocaleTimeString('fr-FR')}`,
-    content: btoa(unescape(encodeURIComponent(contenu))),
+    content: utf8ToBase64(contenu),
     sha: sha,
   };
-  const r = await fetch(url, {
-    method:'PUT',
-    headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-    body: JSON.stringify(body),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
+  let r;
+  try {
+    r = await fetch(url, {
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch(e) {
+    if (e.name === 'AbortError') throw new Error(`Connexion trop lente ou coupée lors de l'écriture de ${fichier} — vérifie sur GitHub si le fichier a bien été mis à jour avant de réessayer.`);
+    throw new Error(`Pas de connexion réseau lors de l'écriture de ${fichier} — vérifie ta connexion et réessaie.`);
+  } finally {
+    clearTimeout(timeoutId);
+  }
   if (!r.ok) {
     const err = await r.json();
     throw new Error(err.message || `Erreur ${r.status}`);
@@ -553,6 +643,7 @@ async function publierSurGithub() {
     if (cfg.visible[prov]) {
       const totalV = Object.values(cfg.voix[prov]).reduce((a,b)=>a+b,0);
       if (totalV===0) warnings.push(`Province ${prov} : visible mais aucune voix saisie`);
+      if (cfg.exprimes[prov]===0) warnings.push(`Province ${prov} : Exprimés non renseignés`);
     }
   });
   if (warnings.length) {
@@ -582,9 +673,10 @@ async function publierSurGithub() {
     updateStep('prov-read', '✅', `${FICHIERS.prov} lu`, 'done');
 
     updateStep('prov-write', '<span class="spinner">⏳</span>', `Mise à jour de ${FICHIERS.prov}...`, 'running');
-    const provContenu = decodeURIComponent(escape(atob(provFile.content.replace(/\n/g,''))));
+    const provContenu = base64ToUtf8(provFile.content);
     const provNew = injecterHTML(provContenu, js);
-    await githubPutFile(token, user, repoProv, FICHIERS.prov, provNew, provFile.sha);
+    const provResult = await githubPutFile(token, user, repoProv, FICHIERS.prov, provNew, provFile.sha);
+    if (!provResult || !provResult.content || !provResult.content.sha) throw new Error(`${FICHIERS.prov} : la réponse de GitHub est incomplète, vérifie manuellement sur GitHub.`);
     updateStep('prov-write', '✅', `${FICHIERS.prov} publié`, 'done');
 
     // Congrès
@@ -593,15 +685,17 @@ async function publierSurGithub() {
     updateStep('cong-read', '✅', `${FICHIERS.cong} lu`, 'done');
 
     updateStep('cong-write', '<span class="spinner">⏳</span>', `Mise à jour de ${FICHIERS.cong}...`, 'running');
-    const congContenu = decodeURIComponent(escape(atob(congFile.content.replace(/\n/g,''))));
+    const congContenu = base64ToUtf8(congFile.content);
     const congNew = injecterHTML(congContenu, js);
-    await githubPutFile(token, user, repoCong, FICHIERS.cong, congNew, congFile.sha);
+    const congResult = await githubPutFile(token, user, repoCong, FICHIERS.cong, congNew, congFile.sha);
+    if (!congResult || !congResult.content || !congResult.content.sha) throw new Error(`${FICHIERS.cong} : la réponse de GitHub est incomplète, vérifie manuellement sur GitHub.`);
     updateStep('cong-write', '✅', `${FICHIERS.cong} publié`, 'done');
 
-    alertsDiv.innerHTML = '<div class="alert ok">🎉 Les deux fichiers sont publiés ! Les iframes seront à jour dans 1-2 minutes.</div>';
+    alertsDiv.innerHTML = '<div class="alert ok">🎉 Les deux fichiers sont publiés et confirmés par GitHub ! Les iframes seront à jour dans 1-2 minutes.</div>';
+    enregistrerDernierePublication();
 
   } catch(err) {
-    alertsDiv.innerHTML += `<div class="alert error">❌ Erreur : ${err.message}</div>`;
+    alertsDiv.innerHTML += `<div class="alert error">❌ Erreur : ${err.message}<br><span style="font-size:.85rem;font-weight:400">Si la connexion a coupé en cours de publication, il est possible qu'un seul des deux fichiers ait été mis à jour. Vérifie sur GitHub avant de republier.</span></div>`;
     // Marquer les étapes en attente comme erreur
     document.querySelectorAll('.prog-step.running, .prog-step:not(.done):not(.error-step)').forEach(el => {
       el.className = 'prog-step error-step';
@@ -614,6 +708,112 @@ async function publierSurGithub() {
 // ═══════════════════════════════════════════════════════════
 // TÉLÉCHARGEMENT (fallback sans GitHub)
 // ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// DERNIÈRE PUBLICATION
+// ═══════════════════════════════════════════════════════════
+function enregistrerDernierePublication() {
+  const now = new Date();
+  localStorage.setItem('rrb_last_publish', now.toISOString());
+  afficherDernierePublication();
+}
+
+function afficherDernierePublication() {
+  const div = document.getElementById('last-publish-info');
+  const stored = localStorage.getItem('rrb_last_publish');
+  if (!stored) { div.style.display = 'none'; return; }
+  const d = new Date(stored);
+  const hh = String(d.getHours()).padStart(2,'0');
+  const mm = String(d.getMinutes()).padStart(2,'0');
+  div.style.display = 'block';
+  div.textContent = `✅ Dernière publication réussie : ${hh}:${mm}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// RÉINITIALISATION
+// ═══════════════════════════════════════════════════════════
+function reinitialiserTout() {
+  if (!confirm("Remettre toutes les provinces à zéro (voix, exprimés, nuls, blancs, visibilité) ? Cette action n'efface rien sur GitHub tant que tu n'as pas republié.")) return;
+
+  ['sud','nord','iles'].forEach(prov => {
+    document.getElementById('exp-'+prov).value = '';
+    document.getElementById('nul-'+prov).value = '';
+    document.getElementById('blc-'+prov).value = '';
+    document.getElementById('visible-'+prov).checked = false;
+    document.getElementById('label-visible-'+prov).textContent = 'Masquée (en attente)';
+    LISTES[prov].forEach((l,i) => {
+      document.getElementById(`voix-${prov}-${i}`).value = '';
+      OVERRIDES[prov][i] = false;
+    });
+    PARTICIPATION_CALC[prov] = 0;
+    onVoixChange(prov);
+  });
+
+  document.getElementById('alerts-pub').innerHTML = `<div class="alert info">🗑️ Tous les champs ont été réinitialisés. Rien n'a été publié — clique sur "Publier" si tu veux appliquer la remise à zéro sur GitHub.</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// REMPLISSAGE RAPIDE POUR TESTS (chiffres fictifs)
+// ═══════════════════════════════════════════════════════════
+function remplirSimulationTest() {
+  if (!confirm("Remplir les 3 provinces avec des voix FICTIVES de test ? À utiliser uniquement pour vérifier que tout fonctionne, jamais le soir des vrais résultats.")) return;
+
+  const SIM = {
+    sud: {
+      exprimes: 73235, nuls: 940, blancs: 1149,
+      voix: {
+        'Les Loyalistes et le Rassemblement': 22750,
+        'Nous, Réunis !': 12658,
+        'Unis pour le pays': 10437,
+        'Un espoir pour demain': 9356,
+        'Pour une Calédonie française': 5395,
+        'France-Calédonie : une patrie': 3415,
+        'Kanaky pour tous': 2931,
+        'Souveraineté Kanaky NC': 2108,
+        'Une province pour tous': 1490,
+        'Un autre monde est possible !': 1346,
+        'Faire Pays': 1349,
+      }
+    },
+    nord: {
+      exprimes: 29091, nuls: 282, blancs: 645,
+      voix: {
+        'UC-FLNKS': 8932,
+        'UNI': 7801,
+        'Alternative Nord pour un pays souverain': 5406,
+        'Faire Pays': 3760,
+        'Agissons ensemble pour le Nord': 3192,
+      }
+    },
+    iles: {
+      exprimes: 13852, nuls: 196, blancs: 316,
+      voix: {
+        'UC-FLNKS Îles': 3873,
+        'PALIKA Îles': 2927,
+        "S'engager et oeuvrer pour la prospérité": 1575,
+        'Nation Autochtone': 1559,
+        'Union pour construire dans le consensus': 1382,
+        'Baselaia': 1314,
+        'Un nouveau souffle': 1222,
+      }
+    }
+  };
+
+  ['sud','nord','iles'].forEach(prov => {
+    document.getElementById('exp-'+prov).value = SIM[prov].exprimes;
+    document.getElementById('nul-'+prov).value = SIM[prov].nuls;
+    document.getElementById('blc-'+prov).value = SIM[prov].blancs;
+    document.getElementById('visible-'+prov).checked = true;
+    onToggle(prov);
+    LISTES[prov].forEach((l,i) => {
+      const v = SIM[prov].voix[l.nom] || 0;
+      document.getElementById(`voix-${prov}-${i}`).value = v;
+    });
+    onVoixChange(prov);
+  });
+
+  document.getElementById('alerts-pub').innerHTML = '<div class="alert info">🧪 Voix de test chargées pour les 3 provinces — clique sur \"Publier\" pour tester le cycle complet.</div>';
+}
+
 function telechargerFichiers() {
   document.getElementById('alerts-pub').innerHTML =
     '<div class="alert info">ℹ️ Pour télécharger les fichiers, ils doivent être dans le même dossier que cette interface. Utilise "Publier sur GitHub" pour la mise à jour directe.</div>';
@@ -621,6 +821,7 @@ function telechargerFichiers() {
 
 // INIT
 ['sud','nord','iles'].forEach(initPanel);
+afficherDernierePublication();
 </script>
 </body>
 </html>

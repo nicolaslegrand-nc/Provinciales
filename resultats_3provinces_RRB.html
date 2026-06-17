@@ -7,7 +7,13 @@
 <style>
 #rrb-root,#rrb-root *{box-sizing:border-box!important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif!important}
 #rrb-root{background:#f0f4fa!important;display:flex!important;flex-direction:column!important;align-items:center!important;padding:0 0 40px!important;width:100%!important;margin:0!important}
-.rrb-topbar{width:100%!important;background:#fff!important;border-bottom:2px solid #1a4dbf!important;padding:12px 20px!important;display:flex!important;align-items:center!important;gap:10px!important;justify-content:center!important;margin:0 0 24px!important}
+.rrb-topbar{width:100%!important;background:#fff!important;border-bottom:2px solid #1a4dbf!important;padding:12px 20px!important;display:flex!important;align-items:center!important;gap:10px!important;justify-content:space-between!important;flex-wrap:wrap!important;margin:0 0 24px!important}
+.rrb-topbar-center{display:flex!important;align-items:center!important;gap:10px!important;margin:0!important}
+.rrb-articles-btn{display:flex!important;align-items:center!important;gap:6px!important;background:linear-gradient(135deg,#1a4dbf,#3498db)!important;color:#fff!important;font-size:.72rem!important;font-weight:800!important;padding:8px 14px!important;border-radius:20px!important;text-decoration:none!important;letter-spacing:.02em!important;white-space:nowrap!important;flex-shrink:0!important;animation:rrb-pulse-blue 2.2s ease-in-out infinite!important}
+@keyframes rrb-pulse-blue{0%,100%{box-shadow:0 2px 8px rgba(26,77,191,0.35);transform:scale(1)}50%{box-shadow:0 3px 18px rgba(52,152,219,0.85);transform:scale(1.035)}}
+.rrb-articles-btn:hover{animation-play-state:paused!important;transform:translateY(-1px) scale(1.04)!important;box-shadow:0 4px 14px rgba(26,77,191,0.55)!important;transition:transform .15s,box-shadow .15s!important}
+.rrb-articles-btn svg{flex-shrink:0!important}
+@media(max-width:640px){.rrb-topbar{justify-content:center!important}.rrb-topbar-center{justify-content:center!important;flex-wrap:wrap!important}.rrb-articles-btn{font-size:.68rem!important;padding:7px 12px!important;margin:0 auto!important}}
 .rrb-logo{height:50px!important;width:auto!important;display:block!important;margin:0!important}
 .rrb-logo-prov{height:55px!important;width:55px!important;object-fit:contain!important;display:block!important;margin:0!important;flex-shrink:0!important}
 .rrb-divider{width:1px!important;height:40px!important;background:#e5e7eb!important;flex-shrink:0!important;margin:0!important}
@@ -44,18 +50,26 @@
 .rrb-elu-num{width:18px!important;height:18px!important;border-radius:50%!important;color:#fff!important;font-size:.6rem!important;font-weight:700!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;margin:0!important}
 .rrb-congres-badge{font-size:.55rem!important;font-weight:700!important;color:#92400e!important;background:#fff3cc!important;border:1px solid #e8a000!important;border-radius:3px!important;padding:1px 4px!important;margin-left:4px!important;white-space:nowrap!important;flex-shrink:0!important}
 .rrb-footer{margin:28px 0 0!important;font-size:.65rem!important;color:#aaa!important;text-align:center!important;padding:12px 0 0!important;max-width:900px!important;width:100%!important;border-top:1px solid #d0d8f0!important;display:block!important}
+.rrb-export-btn{background:#fff!important;border:1px solid #d0d8f0!important;color:#1a4dbf!important;font-size:.72rem!important;font-weight:700!important;padding:7px 16px!important;border-radius:18px!important;cursor:pointer!important;transition:background .15s!important}
+.rrb-export-btn:hover{background:#f0f4fa!important}
 @media(max-width:600px){.rrb-tab{padding:10px 4px!important}.rrb-tl{font-size:.7rem!important}.rrb-tc{font-size:.58rem!important}.rrb-lr{gap:6px!important;padding:8px 10px!important}.rrb-lseat{font-size:1.1rem!important}}
 </style>
 </head>
 <body>
 <div id="rrb-root">
   <div class="rrb-topbar">
-    <img id="logo-prov" class="rrb-logo-prov" src="" alt="Province">
-    <div class="rrb-divider"></div>
-    <img class="rrb-logo" id="logo-rrb-hdr" src="" alt="RRB">
-    <div class="rrb-divider"></div>
-    <div><span class="rrb-title-h">Élections provinciales 2026</span>
-    <span class="rrb-title-p">Nouvelle-Calédonie · 28 juin 2026</span></div>
+    <div class="rrb-topbar-center">
+      <img id="logo-prov" class="rrb-logo-prov" src="" alt="Province">
+      <div class="rrb-divider"></div>
+      <img class="rrb-logo" id="logo-rrb-hdr" src="" alt="RRB">
+      <div class="rrb-divider"></div>
+      <div><span class="rrb-title-h">Élections provinciales 2026</span>
+      <span class="rrb-title-p">Nouvelle-Calédonie · 28 juin 2026</span></div>
+    </div>
+    <a href="https://www.rrb.nc/articles?thematique=77" target="_blank" class="rrb-articles-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M14 3v5h5M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2Z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+      <span>Nos articles provinciales</span>
+    </a>
   </div>
   <div class="rrb-wrap">
     <div class="rrb-tabs" id="rrb-tabs">
@@ -65,14 +79,17 @@
     </div>
     <div class="rrb-panel active" id="rrb-panel-sud">
       <div class="rrb-hw"><svg id="svg-sud" width="100%" height="auto"></svg></div>
+      <div style="text-align:center;margin:0 0 14px"><button class="rrb-export-btn" onclick="exporterImage('sud')">📥 Télécharger l'image</button></div>
       <div class="rrb-lw" id="lw-sud"></div>
     </div>
     <div class="rrb-panel" id="rrb-panel-nord">
       <div class="rrb-hw"><svg id="svg-nord" width="100%" height="auto"></svg></div>
+      <div style="text-align:center;margin:0 0 14px"><button class="rrb-export-btn" onclick="exporterImage('nord')">📥 Télécharger l'image</button></div>
       <div class="rrb-lw" id="lw-nord"></div>
     </div>
     <div class="rrb-panel" id="rrb-panel-iles">
       <div class="rrb-hw"><svg id="svg-iles" width="100%" height="auto"></svg></div>
+      <div style="text-align:center;margin:0 0 14px"><button class="rrb-export-btn" onclick="exporterImage('iles')">📥 Télécharger l'image</button></div>
       <div class="rrb-lw" id="lw-iles"></div>
     </div>
   </div>
@@ -81,70 +98,13 @@
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
 var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
-var PARTICIPATION={"sud":0,"nord":0,"iles":0};
-var SIEGES_OVERRIDE={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 21,
-    'Nous, Réunis !': 0,
-    'Un espoir pour demain': 0,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 9,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 6,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 4
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 0,
-    'PALIKA Îles': 0,
-    'Nation Autochtone': 0,
-    'Union pour construire dans le consensus': 0,
-    'S\'engager et oeuvrer pour la prospérité': 0,
-    'Baselaia': 0,
-    'Un nouveau souffle': 0
-  }
-};
+var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
+var EXPRIMES={sud:0,nord:0,iles:0};
 var VOIX_DATA={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 24500,
-    'Nous, Réunis !': 5596,
-    'Un espoir pour demain': 2654,
-    'Pour une Calédonie française': 256,
-    'Unis pour le pays': 10200,
-    'France-Calédonie : une patrie': 532,
-    'Kanaky pour tous': 7300,
-    'Faire Pays': 1203,
-    'Souveraineté Kanaky NC': 56,
-    'Une province pour tous': 1260,
-    'Un autre monde est possible !': 5598
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 0,
-    'PALIKA Îles': 0,
-    'Nation Autochtone': 0,
-    'Union pour construire dans le consensus': 0,
-    'S\'engager et oeuvrer pour la prospérité': 0,
-    'Baselaia': 0,
-    'Un nouveau souffle': 0
-  }
+  'sud':{'Les Loyalistes et le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
+  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
+  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
 };
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:111923,nord:41983,iles:22166};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -354,7 +314,7 @@ function renderLegende(prov){
     var sv=sp[nom]||0,nc=sc[nom]||0,v=VOIX_DATA[prov][nom]||0;
     var col=COULEURS[prov][nom]||'#999',head=TETES[prov][nom]||'',uid=prov+'_'+idx;
     var cands=CANDIDATS[prov][nom]||[],elus=cands.slice(0,sv).map(invNom);
-    var tot=Object.values(VOIX_DATA[prov]).reduce(function(a,b){return a+b;},0);
+    var tot=EXPRIMES[prov]>0?EXPRIMES[prov]:Object.values(VOIX_DATA[prov]).reduce(function(a,b){return a+b;},0);
     var ps=v>0&&tot>0?('<span class="rrb-lp">'+(v/tot*100).toFixed(1)+' %</span>'):'';
     var vs=v>0?('<span class="rrb-lv">'+v.toLocaleString('fr-FR')+' voix</span>'):'';
     var cur=elus.length>0?'cursor:pointer':'';
@@ -456,6 +416,39 @@ document.getElementById('rrb-tabs').addEventListener('click',function(e){
 });
 
 // ═══ INIT ═══
+// ═══ EXPORT IMAGE ═══
+function exporterImage(prov){
+  var svgEl = document.getElementById('svg-'+prov);
+  var svgData = new XMLSerializer().serializeToString(svgEl);
+  var vb = svgEl.getAttribute('viewBox').split(' ').map(Number);
+  var w = vb[2], h = vb[3];
+  var scale = 2; // export en haute résolution
+  var canvas = document.createElement('canvas');
+  canvas.width = w*scale; canvas.height = h*scale;
+  var ctx = canvas.getContext('2d');
+  var img = new Image();
+  var svgBlob = new Blob([svgData], {type:'image/svg+xml;charset=utf-8'});
+  var url = URL.createObjectURL(svgBlob);
+  img.onload = function(){
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(function(blob){
+      var a = document.createElement('a');
+      var dateStr = new Date().toISOString().slice(0,10);
+      a.href = URL.createObjectURL(blob);
+      a.download = 'hemicycle_'+prov+'_'+dateStr+'.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }, 'image/png');
+  };
+  img.onerror = function(){
+    alert('Export impossible — réessaie après le chargement complet de la page.');
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+
 (function(){
   document.getElementById('logo-rrb-hdr').src=LOGO_RRB_HDR;
   document.getElementById('logo-prov').src=LOGOS_PROV['sud'];
