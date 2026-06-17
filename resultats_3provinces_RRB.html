@@ -97,72 +97,14 @@
 </div>
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
-var PROVINCES_VISIBLES={sud:true,nord:true,iles:true};
-var PARTICIPATION={"sud":67.2998400686186,"nord":0,"iles":64.80194893079491};
-var EXPRIMES={sud:73235,nord:0,iles:13852};
-var SIEGES_OVERRIDE={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 17,
-    'Nous, Réunis !': 9,
-    'Un espoir pour demain': 7,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 7,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 0,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 0
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 4,
-    'PALIKA Îles': 3,
-    'Nation Autochtone': 2,
-    'Union pour construire dans le consensus': 1,
-    'S\'engager et oeuvrer pour la prospérité': 2,
-    'Baselaia': 1,
-    'Un nouveau souffle': 1
-  }
-};
+var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
+var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
+var EXPRIMES={sud:0,nord:0,iles:0};
 var VOIX_DATA={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 22750,
-    'Nous, Réunis !': 12658,
-    'Un espoir pour demain': 9356,
-    'Pour une Calédonie française': 5395,
-    'Unis pour le pays': 10437,
-    'France-Calédonie : une patrie': 3415,
-    'Kanaky pour tous': 2931,
-    'Faire Pays': 1349,
-    'Souveraineté Kanaky NC': 2108,
-    'Une province pour tous': 1490,
-    'Un autre monde est possible !': 1346
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 3873,
-    'PALIKA Îles': 2927,
-    'Nation Autochtone': 1559,
-    'Union pour construire dans le consensus': 1382,
-    'S\'engager et oeuvrer pour la prospérité': 1575,
-    'Baselaia': 1314,
-    'Un nouveau souffle': 1222
-  }
+  'sud':{'Les Loyalistes et le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
+  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
+  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
 };
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:111923,nord:41983,iles:22166};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -355,11 +297,11 @@ function renderSVG(prov){
   s+='<line x1="20" y1="'+(HH+44)+'" x2="'+(W-20)+'" y2="'+(HH+44)+'" stroke="#d0d8f0" stroke-width="1"/>';
   if(shown.length>0){shown.forEach(function(nom,idx){var c=idx%COLS,row=Math.floor(idx/COLS),fx=sx+c*CW,fy=HH+59+row*22,nm=nom.length>24?nom.substring(0,24)+'…':nom,col=COULEURS[prov][nom]||GREY,sv=sp[nom]||0;s+='<circle cx="'+(fx+7)+'" cy="'+(fy-4)+'" r="7" fill="'+col+'"/><text x="'+(fx+18)+'" y="'+fy+'" font-family="Arial,sans-serif" font-size="11" fill="#333">'+nm+' <tspan font-weight="900" fill="'+col+'">'+sv+'</tspan></text>';});}
   else{s+='<text x="'+CX+'" y="'+(HH+59)+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#bbb" font-style="italic">En attente des résultats</text>';}
-  s+='<rect id="ib_'+prov+'" x="10" y="10" width="400" height="78" rx="10" fill="#1a4dbf" opacity="0"/>';
-  s+='<text id="it1_'+prov+'" x="210" y="36" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#fff" opacity="0"></text>';
-  s+='<text id="it2_'+prov+'" x="210" y="58" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="900" fill="#fff" opacity="0"></text>';
-  s+='<rect id="ibadge_'+prov+'" x="170" y="66" width="80" height="16" rx="8" fill="#fff3cc" stroke="#e8a000" stroke-width="1" opacity="0"/>';
-  s+='<text id="itbadge_'+prov+'" x="210" y="77" text-anchor="middle" font-family="Arial,sans-serif" font-size="9.5" font-weight="900" fill="#92400e" opacity="0">★ Congrès</text>';
+  s+='<rect id="ib_'+prov+'" x="250" y="6" width="400" height="78" rx="10" fill="#1a4dbf" opacity="0"/>';
+  s+='<text id="it1_'+prov+'" x="450" y="32" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#fff" opacity="0"></text>';
+  s+='<text id="it2_'+prov+'" x="450" y="54" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="900" fill="#fff" opacity="0"></text>';
+  s+='<rect id="ibadge_'+prov+'" x="410" y="62" width="80" height="16" rx="8" fill="#fff3cc" stroke="#e8a000" stroke-width="1" opacity="0"/>';
+  s+='<text id="itbadge_'+prov+'" x="450" y="73" text-anchor="middle" font-family="Arial,sans-serif" font-size="9.5" font-weight="900" fill="#92400e" opacity="0">★ Congrès</text>';
   var el=document.getElementById('svg-'+prov);
   el.setAttribute('viewBox','0 0 '+W+' '+HSVG);el.innerHTML=s;
   attachSeatEvents(prov);
