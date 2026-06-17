@@ -97,72 +97,14 @@
 </div>
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
-var PROVINCES_VISIBLES={sud:true,nord:false,iles:true};
-var PARTICIPATION={"sud":67.2998400686186,"nord":0,"iles":64.80194893079491};
-var EXPRIMES={sud:73235,nord:0,iles:13852};
-var SIEGES_OVERRIDE={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 17,
-    'Nous, Réunis !': 0,
-    'Un espoir pour demain': 0,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 7,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 9,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 7
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 4,
-    'PALIKA Îles': 3,
-    'Nation Autochtone': 2,
-    'Union pour construire dans le consensus': 1,
-    'S\'engager et oeuvrer pour la prospérité': 2,
-    'Baselaia': 1,
-    'Un nouveau souffle': 1
-  }
-};
+var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
+var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
+var EXPRIMES={sud:0,nord:0,iles:0};
 var VOIX_DATA={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 22750,
-    'Nous, Réunis !': 2931,
-    'Un espoir pour demain': 1346,
-    'Pour une Calédonie française': 5395,
-    'Unis pour le pays': 10437,
-    'France-Calédonie : une patrie': 3415,
-    'Kanaky pour tous': 12658,
-    'Faire Pays': 1349,
-    'Souveraineté Kanaky NC': 2108,
-    'Une province pour tous': 1490,
-    'Un autre monde est possible !': 9356
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 3873,
-    'PALIKA Îles': 2927,
-    'Nation Autochtone': 1559,
-    'Union pour construire dans le consensus': 1382,
-    'S\'engager et oeuvrer pour la prospérité': 1575,
-    'Baselaia': 1314,
-    'Un nouveau souffle': 1222
-  }
+  'sud':{'Les Loyalistes et le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
+  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
+  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
 };
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:111923,nord:41983,iles:22166};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -346,7 +288,7 @@ function renderSVG(prov){
   var majo=Math.ceil(tot/2)+1;
   var barW=W-280, barX=140;
   s+='<text id="majo_lbl_'+prov+'" x="'+barX+'" y="'+(majoY-12)+'" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#666">Majorité absolue</text>';
-  s+='<text id="majo_txt_'+prov+'" x="'+(barX+barW)+'" y="'+(majoY-12)+'" text-anchor="end" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#e82020">'+majo+' sièges requis</text>';
+  s+='<text id="majo_txt_'+prov+'" x="'+(barX+barW)+'" y="'+(majoY-12)+'" text-anchor="end" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#555">'+majo+' sièges requis</text>';
   s+='<rect x="'+barX+'" y="'+majoY+'" width="'+barW+'" height="8" rx="4" fill="#e5e9f5"/>';
   s+='<rect id="majo_fill_'+prov+'" x="'+barX+'" y="'+majoY+'" width="0" height="8" rx="4" fill="#1a4dbf"/>';
   var markX=barX+barW*(majo/tot);
@@ -443,7 +385,7 @@ function updateMajoBar(prov, seats, col, liste){
   var nm = liste.length>22?liste.substring(0,22)+'…':liste;
   lbl.textContent = nm;
   txt.textContent = seats+' / '+d.majo+' sièges requis';
-  txt.setAttribute('fill', col);
+  txt.setAttribute('fill', '#555');
 }
 function resetMajoBar(prov){
   var d=majoBarData[prov]; if(!d) return;
@@ -455,7 +397,7 @@ function resetMajoBar(prov){
   fill.setAttribute('fill', '#1a4dbf');
   lbl.textContent = 'Majorité absolue';
   txt.textContent = d.majo+' sièges requis';
-  txt.setAttribute('fill', '#e82020');
+  txt.setAttribute('fill', '#555');
 }
 function toggleElus(uid){
   var el=document.getElementById('elus-'+uid),arr=document.getElementById('arr-'+uid);
