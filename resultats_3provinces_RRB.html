@@ -97,72 +97,14 @@
 </div>
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
-var PROVINCES_VISIBLES={sud:true,nord:true,iles:true};
-var PARTICIPATION={"sud":67.2998400686186,"nord":0,"iles":64.80194893079491};
-var EXPRIMES={sud:73235,nord:0,iles:13852};
-var SIEGES_OVERRIDE={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 17,
-    'Nous, Réunis !': 9,
-    'Un espoir pour demain': 7,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 7,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 0,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 0
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 4,
-    'PALIKA Îles': 3,
-    'Nation Autochtone': 2,
-    'Union pour construire dans le consensus': 1,
-    'S\'engager et oeuvrer pour la prospérité': 2,
-    'Baselaia': 1,
-    'Un nouveau souffle': 1
-  }
-};
+var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
+var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
+var EXPRIMES={sud:0,nord:0,iles:0};
 var VOIX_DATA={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 22750,
-    'Nous, Réunis !': 12658,
-    'Un espoir pour demain': 9356,
-    'Pour une Calédonie française': 5395,
-    'Unis pour le pays': 10437,
-    'France-Calédonie : une patrie': 3415,
-    'Kanaky pour tous': 2931,
-    'Faire Pays': 1349,
-    'Souveraineté Kanaky NC': 2108,
-    'Une province pour tous': 1490,
-    'Un autre monde est possible !': 1346
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 3873,
-    'PALIKA Îles': 2927,
-    'Nation Autochtone': 1559,
-    'Union pour construire dans le consensus': 1382,
-    'S\'engager et oeuvrer pour la prospérité': 1575,
-    'Baselaia': 1314,
-    'Un nouveau souffle': 1222
-  }
+  'sud':{'Les Loyalistes et le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
+  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
+  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
 };
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:111923,nord:41983,iles:22166};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -187,33 +129,34 @@ var ORDRE={
 };
 var CANDIDATS={
   sud:{
-    'Les Loyalistes et le Rassemblement':["BACKES Sonia","METZDORF Nicolas","RUFFENACH Virginie","BRIAL Gil","UKEIWE Marie-Laure","PAAGALUA Lionel Claude","JULIÉ Nina","VITTORI Pascal","TRAN épouse BUI-DUYET Amandine","GYGES Christopher","JAN Cynthia","BASSET-CREUGNET Loïc","WATEOU Naïa","FROGIER Brieuc","VENDEGOU Laura","NORMANDON Cael","WAMEDJO Guylène","COURTOT Jordan","BARBIER Marie-Jo","ROY Levay","MOREAU Laure","ROSSARD Xavier","MALFAR-PAUGA Muriel","YAMAMOTO Nicolas","TRIPODI Léa","PERRIN Florent","MULIAKAAKA Wendy","POIWI Stephane","BARBOU née KELETAONA Lute","TAOFIFENUA Jonas"],
-    'Nous, Réunis !':["DUNOYER Philippe","PIDJOT-ALLARD Nadine","MACHFUL Alexandre","LECOURTIER EP MÜNKEL Mireille","PIOLET Gérard Lucien Raoul","PUJOL Ingrid","FAUCHER Kim Nils","FALEALUPO Malia Lusia","THUPAKO Olivier","BOUTEILLER Martine","TRINDADE DE ABREU Abedias","KAGY Sam","SIRET Claude Marie","NG Karen","BASSI Anthony","WATEOU Lydia Lara","MEYER David","FONTENEL Nadine","DINH Jean-Marc Michel","THUPAKO DELBREIL Aline Hnyalo","EXPOSITO Franck","LEU Mireille","MACABIES Pierre-Henri Georges","CITRE Alysse Wajojo Shinilanne","FILITIKA Michaël","RIPERT Delphine","TAVOUVAS Yoan Edouard","MOREAU Nicole","HNAWANG Zacharie","MARANT Pascale"],
-    'Un espoir pour demain':["LAFLEUR Pascal","VAN RYSWYCK Patricia","KASARHEROU Joël","HOMBOE Michele","MAYERAU-LONNE Thierry","ANDRE Cathleen","CHARLES Olivier","PANDOSY Frédérique","GARRIGOU David","CHENIN Christine","LUQUET Sanjay","ANDRY Stella","TAOFIFENUA Atéléa","BOURINEAU Valérie","KADDOUR Didier","GOPEA Cathy","DIGOUE Richard Jean-Francis","SOEMOWIRONO Linda","TIVOLLIER Jean-Michel","CHEVALIER Séverine-Valérie"],
-    'Pour une Calédonie française':["LEQUES Arnold","HENIN Bianca","MOGLIA Jean-Charles","PREVEL Jennifer Sarah","LEMAITRE Philippe","BROSSARD Patricia","BOURGINE Christopher","CREUGNET Floriane Marie","LAIGLE Karl","MAIAU Suzanne"],
-    'Unis pour le pays':["MAPOU Louis","KOUATHE Inès","GAMBEY Claude","PAILLARD Virginie","BONNARD Franck-Gérard","POIGOUNE Bella Marjorie","MAPERI Sagato","GUAENERE Julia Danielle","BOUEARAN Mario Alain","ANGLEBERMES Mégane Odette","FICHTER Rudy Roger","OFFLAVILLE Sarah","MONEFARA Pierre","WANAKAHME Marguerite Cuké","ATTI Lary","BOERE Cheyenne","WONG KONG TAO Pierre Vetea","HONAKOKO Jade","VAOHEILALA Pelenato","AOURIGNA ép ATINOUA Sandrine"],
-    'France-Calédonie : une patrie':["DESCOMBELS Alain","HOANG Elena","LAVILLE Nicolas-Pierre","PAHOA Elisabeth","QUINET Stephane","LE GRAND Laura","ÉTILÉ Johnny","QUINQUIS Valerie","PAQUEREAU Patrice","BRÉMOND Hélène"],
-    'Kanaky pour tous':["WAMYTAN Johanito","TROLUE Oriane Cingône","FOCHI Dominique","GOYETCHE Marie-Pierre","TOURA Jean Patrick","LIKILIKI ép. HUMUNI Laurie","ATINOUA Joe","DARRAS Amandine","AYAWA Jean-Marie","KOTRA Lucia","BEANOU Michel","GAIA ép. ALOSIO Nikita","NEWEDOU Antonio","TOUTIKIAN Emiliana Ikee","BOANEMOA Joseph","HONAKOKO ép. AUCHER Rachelle"],
-    'Faire Pays':["KAKUE Robert","LEQUATRE Marie-Madeleine","COURTE Stephane","DOUEPERE Jessica Marie Laurette","CHATENAY Laurent"],
-    'Souveraineté Kanaky NC':["CHAZAL Dominique Alain Michel","ROKUAD Edmonde Ako Tupoue Annie","VAMA Eugène Karl","MACKENZIE Alexandra Malia Sonia","SELEFEN Jean-Pierre"],
-    'Une province pour tous':["KOTRA Walles","LACROSE Angélina","NATUREL Georges","TOURTE TROLUE Marie-Paule","KATIDJO MONNIER Jérémie"],
-    'Un autre monde est possible !':["TUKUMULI Milakulo","FALAEO Veylma","PUAHIO Teva","HEMA Sandra","MULIAVA Vaimua"]
+    'Un autre monde est possible !':["TUKUMULI Milakulo","FALAEO Veylma","PUAHIO Teva","HEMA Sandra","MULIAVA Vaimu\'a","CRONSTEADT Laëtitia","SAO Petelo","HAELEMAÏ Virginie","CAPECCHI Olivier","FAKATAULAVELUA Tiané","ASSANOUMA Jordhan","VAITULUKINA Pascaline","VAKALEPU Franck","TRAN Anne","MAPOU Joan","HAMBLIN Roxanne","TUUFUI Jaice","GUYETTE Suzanne","VEA Jimmy","SIMUTOGA Mahéva","TAOFIFENUA Polikalepo","GAÏA Katia","GALU Filipo","OLSEN Morgane","TEUIRA Heimana","CAGNEWA Alizée","TUTURU Martin","TUI ép TAUKAPA Ludovia","KERLEGUER Lénaic","LAKALAKA Maéva","MAITUKU Franck","LETHEZER Corinne","LAMI Sélé","MARENGO Jessica","FOLITUU Kamali","TOLUAFE Sonia","SELUI Simon Pierre","FETAULAKI ép PAKAINA Madeleine","CARIOU Clifford","VAKAULIAFA Jaël","KAIKILEKOFE Melekiate","WENEGUEI Hélène","LECOLE Jean-Charles","LAMATA Evelyne","TAFILAGI Soane","GOPOEA Véronique","LOTAUT Jean Michel","KOINDREDI Bernadette","AMOLE Joseph","MANUFEKAI ép DROUET Malia Sosefo"],
+    'Kanaky pour tous':["WAMYTAN Johanito","TROLUE Oriane Cingöne","FOCHI Dominique","GOYETCHE Marie-Pierre","TOURA Jean, Patrick","LIKILIKI ép. HUMUNI Laurie","ATINOUA Joe","DARRAS Amandine","AYAWA Jean-Marie","KOTRA Lucia","BEANOU Michel","GAÏA ép. ALOSIO Nikita","NEWEDOU Antonio","TOUTIKIAN Emiliana Ikee","BOANEMOA Joseph","HONAKOKO ép. AUCHER Rachelle","TARA Patrick","EATENE Roseline Kamen","DINCLAUX Laurent","KALOÏ Charlotte","TOKOTOKO Christopher","VAMA Tatiana","JUNI Henri Mao","MATAILA Marie-Chanel","LECLERE Daniel","POUYE-HAIU Athena","KIKI Edgard","LEAKAVA Sononefa","HOVEUREUX Jean Michel","KOINDREDI Myriam","WEDOI Philippe Kaoua","COMBO Ernestine","OUNOU Walter","SALIGA Asinoe","TOURA Alex","PHADOM ép. IEKAWE Jocelyne","HOMOU Louis Pidjot","WAHEO Denise","MALALUA Jean-Fidéli","TENDA Henriette","BOANEMOI Julien","WAJOKA Rebecca","AVILA Kelly","POUKIOU Aurélie, Jeanne","SAKO Aloisio","POLUTELE ép. KIKANOI Hélène","TEIN Christian","JINAKOA Roselyne","WAMYTAN Roch","UEDRE Odette"],
+    'France-Calédonie : une patrie':["DESCOMBELS Alain","HOANG Elena","LAVILLE Nicolas-Pierre","PAHOA Elisabeth","QUINET Stephane","LE GRAND Laura","ÉTILÉ Johnny","QUINQUIS Valerie","PAQUEREAU Patrice","BRÉMOND Hélène","POILAGI Jean-Michel","VERNAY Romane","BERGER Killian","PHAM Maria","BOUTEFEU Jacques","BOUTEILLER Sonia","MOMOI Atonio-Falemana","SALAUN Maryse","LIGNIERES Luc","ASKARTI Rose-May","LAURENT Alain","POILAGI -- FOUQUES Kara","ETCHEVERRY Philippe","GUILLON Marianne","TERIIPAIA Walter","MONI Patricia","SONG Yves Gabriel","VOLSANT Evelyne","MARCUZZO Didier","AVARGUEZ Martine","BARBIER Laurent","TALLONNIER Isabelle","ROLLAND Martino","SITU Florence","GIROLD Yves","FOSTER dit FOGLIANI Marielle","FAVERO Georges","OUTU Gloria","POLI Miguel","RUFFINONI Paulette","ROUQUETTE Gerald","TURPIN Michèle","PINCOT Clément","MATSUDA Marie-France","RAINOUARD Raoul","HAUTIER Lauren","DALBIEZ Rolland","GOTA Isabelle","POCHARD Yannick","KAWA Christiane"],
+    'Une province pour tous':["KOTRA Walles","LACROSE Angélina","NATUREL Georges","TOURTE TROLUE Marie-Paule","KATIDJO MONNIER Jérémie","QAEZE Jinézi Annie","KAATEU Maurice","RAMESH ép NIULIKI Isabelle Chandrawati","BUSSEI Joël","CHEVAL Marielle","TURAUD Bertrand","POURCELOT Ingrid","KAYS Jean","VERONS Armelle","LATOUPIE Ely","KOTEUREU Yolène","MILOUD Hary","SALIGA Meitoga","TINDAO John Rock","VOISIN Corine","SONG Thierry","WEDE Sabrina","NOFONOFO Féléki","LOPEZ Marie-Noëlle","MOISSON Gino","MOHAMED ép MICHEL Christine","ATITI Jérémy","SIVI Iden Cascia","PITO Angelo Teriiehoamarotetinitahuéa","HAMU Henriette, Meune","FOURNIER Richard","BINIC Lyne","SALIGA Roméo","POULAWA Potheylor","CHALIOT Jean Christophe","TAVITA Méré","BERNALEAU Noël","TEHAHETUA épouse CAENA Davina","LEME Mickael","GASTALDI ép JANDOT Monique","LELEIVAÏ Emmanuel","LAIGLE Marylise","HNAGEJE Philippe","WAYARIDRI Estelle, Oné","MUSUMUSU Kalisito","MILELLA Sabine","VAKIE Christophe","KASIMILO Didia","SANTACROCE Ghislain","ROBINEAU Nicole"],
+    'Souveraineté Kanaky NC':["CHAZAL Dominique Alain Michel","ROKUAD Edmonde Ako Tupoue Annie","VAMA Eugène Karl","MACKENZIE Alexandra, Malia, Sonia","SELEFEN Jean-Pierre","WINCHESTER Laurence Tetua Edna Maeva","TIPOTIO Auto","MOENIR Lucynda Melissa","MALTAUS Charles","MAURIN Sirima Evangelista","HERNU Emmanuel Jacques","LOTOLOTOLUA Annick, Aleta","APIKAOUA Jonathan, Thierry, Joseph","HAUTAUFAAO Malia Pakaina","TEIN Roberto, Jean, Hilaire","OUNEI Emillienne, Julia","SAMIN Jean Pascal Soegianto","SASTRODIHARDJO Lysiane, Miriam","CEJO Noel Billy","TAUOTAHA Elisabeth","TOGOLEI Philippe","LOTOLOTOLUA Anita","AÏFA Patrick Pierre","MACCAM ép SALMON Shirley","TINILOA Rudy","DOUEPERE Anne Pascale","TAUKOLO Cedric Saint Pierre","BRUKUOOUA Ramsa, Françisca, Ilora","VINCENT Philippe Christophe","MORINI Tiaré, Lydia, Sumalee","MACCAM Pierre Christian","NAPOREA Hélène","SELEFEN Yann","GENET Rosemonde","SIOREMU Charles Kaloi","THEAIN-POIDJILIMA Yoricka, Marie-Louise","DOUEPERE Emile","TEANYOUEN Erika Marjolaine","DUQUESNE Hervé, André","MACCAM Angélique","TUIFUA Guy Philippe Falemana","KAINDA Marie-Rosine","FALELAVAKI Mathieu","DUQUESNE Lauria, Augustine, Jeanne","BRUIREU John, Berthier, Leon","LAPETITE Marielle Annick","SELEFEN Nicolas Kemedjie","PADOME ép.NAPORAPOE Kawo, Nione","NIGAOURA René","MACCAM Lysa Augustine Marcelline Clemence"],
+    'Faire Pays':["KAKUE Robert","LEQUATRE Marie-Madeleine","COURTE Stephane","DOUEPERE Jessica, Marie, Laurette","CHATENAY Laurent","JUNI Qatrenë","AVALLARD Benoît, Didier, Raymond","PIDJOT Jacqueline, Marie-Josephe","SIMON Gregory Emile","VAITULUKINA Marie, Isabelle","BETRANCOURT Jerome","BOUYE Elodie","TAOFIFENUA Joshua","SAIHULIWA Yaëlle","REVERCE Olivier","DINAGUE Regine","FONTEIX Pierre-Yves","NEPWE-ERU Estelle, Mou","DOELLAH Lione, Gunavan","HAEWENG Nicole","GAVIN Warren","FILIMOEHALA Paulette","ATINOUA Patrice, Martial","WEISS Yulika, Jerry, Eleonore","LEVEQUE Xavier","KAATEU Aurelia","THIA Alphonse, Jean-Philippe","BAE Marie-Louise","WADRA Jean-Christian","SOEKARDJAN Chloe","WABETE Jacques, Shene","WIN-NEMON Cale, Stephanie","CARAMESSY Ulm, Christ, Jean-Luc","HORNGREN Marie-Michelle, Ouengheou","LAUALIKI Vincent","KAWA Leyla","BOSIO Kevin, Terai, Donald","MOYATEA Ondine","VANWALSCAPPEL Karl, Jacques, Remy","VENDEGOU Berthe, Marie, Bernade","STREETER Eric","CUBADDA Isabelle, Nicole, Sylvie","MALO Andy","PUJOL Florence","COSTA Richard","TIHA Marie-Renee, Vanessa","OBERTAN Cedric","AMIOT Stephanie","WEBER Steeve","MICHEL Ericka"],
+    'Pour une Calédonie française':["LEQUES Arnold","HENIN Bianca","MOGLIA Jean-Charles","PREVEL Jennifer, Sarah","LEMAITRE Philippe","BROSSARD Patricia","BOURGINE Christopher","CREUGNET Floriane, Marie","LAIGLE Karl","MAIAU Suzanne","EDO Laurent","KASSIRAN Charline, Linda","CHABRAND Mehndy","DEVAUD Sonia","BROUSSE DE LABORDE Rodrigue, Allan, Serge","KERFOURN Christelle, Liliane, Marie-Thérèse","PALADINI William","CARNICELLI Catherine","DESTOURS Alain","PIERSANTI Priscillia, Naissa, Maria","BROSSARD Hugues","CITERNE Corinne, Mélanie, Jacqueline","SIMON Christian, Edmond, Raymond","DEVAUD Christelle","BRUNET Christophe","HAUTCOEUR Sylvie","DRISS Ludovic","PALADINI Apryl, Sharon","DEMENE Pierre","LEGRAS Aude, Karene, Claude","APPAVOU Erick","MANAUTE Rhiannon","MOGLIA Marc-Victor","BODIN Fabienne","DURAND Philippe","WEILLANT Denise","DEVAUD Eric","GARCIA Murielle","BOURGINE Yves","TROALEN Marie-Louise, Berthe","HENIN Henri","LOMBARD Lauriane","NAGELEISEN Nicolas, Paul, Robert, Nyeoko","DONNEAU Françoise","GASTALDI Serge","TOURNIER Yvana","LAIGLE Bernard","DE BACOUR Stella","ERYN Gilles, J.Marie","HERBERT Valérie"],
+    'Nous, Réunis !':["DUNOYER Philippe","PIDJOT-ALLARD Nadine","MACHFUL Alexandre","LECOURTIER EP MÜNKEL Mireille","PIOLET Gérard Lucien Raoul","PUJOL Ingrid","FAUCHER Kim, Nils","FALEALUPO Malia, Lusia, Filiketuha, Pailatoga","THUPAKO Olivier","BOUTEILLER Martine","TRINDADE DE ABREU Abedias","KAGY Sam","SIRET Claude, Marie","NG Karen","BASSI Anthony","WATEOU Lydia Lara","MEYER David","FONTENEL Nadine","DINH Jean-Marc, Michel","THUPAKO DELBREIL Aline Hnyalo","EXPOSITO Franck","LEU Mireille","MACABIES Pierre-Henri, Georges","CITRE Alysse Wajojo Shinilanne","FILITIKA Michaël","RIPERT Delphine","TAVOUVAS Yoan, Edouard","MOREAU Nicole","HNAWANG Zacharie","MARANT Pascale","COUSTENOBLE Frédérick","WAYARIDRI Laura, Gumano","HUBERT Frédéric","PUAPUA Myriam Anosiata","BASQUIN Bernard","WAHNAWE Marie-Christine","TAURAATUA Michaël Alexandre","TOURNIER Maéva","MAMELIN Mickael","MANYIN Caroline Haudra","ARNOULD Dominique","FERRIOT Valérie","LEME Philippe","FOISNON Gisèle Graziella","BEGAUD Sylvain, Jacques, René","CITRE Thelemo, Ines, Annie-Lyse","WENDT José","YEKAWENE Jessica","MACHFUL Nicolas","LEQUES Evelyne, Margueritte"],
+    'Les Loyalistes et le Rassemblement':["BACKES Sonia","METZDORF Nicolas","RUFFENACH Virginie","BRIAL Gil","UKEIWE Marie-Laure","PAAGALUA Lionel Claude","JULIÉ Nina","VITTORI Pascal","TRAN épouse BUI-DUYET Amandine","GYGES Christopher","JAN Cynthia","BASSET-CREUGNET Loïc","WATEOU Naïa","FROGIER Brieuc Nahea","VENDEGOU Laura","NORMANDON Cael","WAMEDJO Guylène","COURTOT Jordan","BARBIER Marie-Jo","ROY Levay","MOREAU Laure","ROSSARD Xavier","MALFAR-PAUGA Muriel","YAMAMOTO Nicolas","TRIPODI Léa","PERRIN Florent","MULIAKAAKA Wendy","POIWI Stephane","BARBOU née KELETAONA Lute","TAOFIFENUA Jonas","BULEWAK Wendy Jeannette","MUGNIER Matthieu","BUI-DUYET Diane","SIVI Yan","SARIDJAN-VERGER Christiane","FIJALKOWSKI Nicolas","PAGES Morgan","LOUECKHOTE Martin","REUTER Carla","BERART Emmanuel","GALINIÉ Laurence","TEIN BAI Patrick","COURTOT épouse D\'ARCANGELO Maryline","ALOSIO Roger","NEWLAND Dominique","MEDEVIELLE Georges","TERIA Karlenn","ROMAIN Antoine","LELONG Mathilda","PEYRONNET Léon-Joseph"],
+    'Unis pour le pays':["MAPOU Louis","KOUATHE Inès","GAMBEY Claude","PAILLARD Virginie","BONNARD Franck-Gérard","POIGOUNE Bella, Marjorie","MAPERI Sagato","GUAENERE Julia Danielle","BOUEARAN Mario, Alain","D\'ANGLEBERMES Mégane, Odette","FICHTER Rudy, Roger","OFFLAVILLE Sarah","MONEFARA Pierre","WANAKAHME Marguerite, Cuké","ATTI Lary","BOERE Cheyenne","WONG KONG TAO Pierre, Vetea","HONAKOKO Jade","VAOHEILALA Pelenato","AOURIGNA ép ATINOUA Sandrine","HANQUEZ Joseph, Claude","KAPISSIRI Milca","MONAWA Ignace, Oscar","PEBOU-POLAE Emilie, Aurore, Mathilde","DESEIGNE Philippe","SIRO Sonia","SELEFEN Pothin, André","TIEOUE Ithupane","KAATEU Christian","SARATINSKY ep EZZINE Karine","NICAR Patrick","TONHOUERI Prisca, Raiza","AGOURERE Michel, Kai","BELIOT Seyrane","GAIA Jean-Rock","UREGEI ép TAIN Laura","MEDIARA Cédric","POIWI Kenza","KOUTCHAOUA Benjamin","FOUYE Dorothée","GOHE Jean","NEWEDOU Marie-Christine","NONMOIRA Pierre-Chanel","VENDEGOU Marie-Joelle","GOWEHOU Etienne","WEMA-MOHAMED Murielle","PAOURO Clément, Mickael","VAKIE ép HNAGEJE Celesta","VAKIE Yvannick","DIGOUE Justine, Eva"],
+    'Un espoir pour demain':["LAFLEUR Pascal","VAN RYSWYCK Patricia","KASARHEROU Joël","HOMBOE Michele","MAYERAU-LONNE Thierry","ANDRE Cathleen","CHARLES Olivier","PANDOSY Frédérique","GARRIGOU David","CHENIN Christine","LUQUET Sanjay","ANDRY Stella","TAOFIFENUA Atéléa","BOURINEAU Valérie","KADDOUR Didier","GOPEA Cathy","DIGOUE Richard, Jean-Francis","SOEMOWIRONO Linda","TIVOLLIER Jean-Michel","CHEVALIER Séverine-Valérie","HOMBOE Frédéric","HOLLE née WAKELI Valentine","WOSTROWSKI Wilfried","LECREN Lollita","DUVAL Henri-Bernard","RENARD Diana","FILIKESA Tevita","CHODEY Joëlle","LAGABRIELLE Hervé","RINAUDO Isabelle","PRIGENT Hervé","PERRAUD ep LAGABRIELLE Laurence","PAPROCKI Thierry","BOURNE Vanessa","SORGE Ferdinand","DUVAL Audrey","HIREP Paul-Joseph","RENAUD Kareen","PASSIL Georges","SOENNE Colette","UGOLINI Michel","REVER EP LOZACH Yveline","LAIGLE Miguel","BABIN Elisabeth","GAZEAU Philippe","LAUNAY ep LAIGLE Nathalie","CHOMBEAU Xavier","MAILLERET Claude","LYON André","WABEALO Marie-Augustine"]
   },
   nord:{
-    'UC-FLNKS':["SAWA Pascal","TIDJINE épouse HMAE Henriette","TUTUGORO Pierre Chanel","TOURA ép. KAICHOU Jacinthe Marie-Claire","DEDANE Florentin","WAKA Maria","NEDENON Gaston","KONDOLO Josée","TEIN-TAOUVA Hervé","GOROMOTO Christiane"],
-    'UNI':["NEAOUTYINE Paul","EURISOUKE Valentine","GOROMIDO Joseph","WACKENTHALER ép. FAIVRE Nadeige","BOEWE Joseph","POYMEGNA Doriane","DAHOTE Ezéckiel Wavane"],
-    'Alternative Nord pour un pays souverain':["MENREMPON Eugene Tanaiche","NERHON Linda","TIDJINE Serge","BOKOE-GOWE Elsy Graziella Wassako","POUYA Thierry Jean-Yves"],
-    'Faire Pays':["WAKA-AWA Maurice"],
-    'Agissons ensemble pour le Nord':["WACAPO Vanessa"]
+    'Agissons ensemble pour le Nord':["WACAPO Vanessa","BILLIET Edwin","PONGA Juliana","NORMANDON Caryl Edouard","TEIN-BAÏ Valérie","WATANABE Maurice","SANTAROSSA Amanda","MARTIN Antonio","M\'BEREOU Magali","KABAR Eric Josiah","CHENU Isabelle","WEISS Wilfrid","GAÜZERE Célia","PONGA Alcide","NICOLI Anne-Laure Simone Germaine","VIASSONE Patrice, Marie","MEBOEDE Kareen","NENOU-PWATAHO Raymond","DEBELS Sylvana","PARAWI Gianni","GUILLERMET Lynda","OBRY Jean","DUBOIS Estelle, Marie-France","RIVIERE Franck","DEVILLERS épouse GAUVAN Joyce","BAUDRY Jean-Yves","POINDIPENDA Marie-Jessica","DUBOIS Steeve","LE-GALL Glorianne","BROWN Roy Ulric","YOUNG Maryline Thérèse","WINCHESTER Wilfrid"],
+    'Alternative Nord pour un pays souverain':["MENREMPON Eugene Tanaiche","NERHON Linda","TIDJINE Serge","BOKOE-GOWE Elsy Graziella Wassako","POUYA Thierry Jean-Yves","PIDJO Marie-Joëlle Fagane","DILLENSEGER Julien Auguste René","BOEHE Angy Singride","WAYENECE André","POARAGNIMOU Brigitte Mounh","SOLE Jean Noel","MACHORO Francette","YARIK Gaston","RICHARD Ophelie Suzanne","VAIALIMOA Gilbert Tein Pouco","WADRIAKO Oraÿina, Christa, Serena, Shanima","POMA Jean-François Poide","BOIGUIVIE Marie Scholastique","KARTODIMEDJO Jean-Yves","HOUWILI Ismaëlla Raphaella","NIANDOU Louis Tianepe","FOAWY Therese Naomie","NAHIET Gilles Fangio","POUMA Vanie, Isaora, Florisse, Katia","MEUREUREU GOWE François Julien","NAWA Madeleine Pouya","WONGSOKARTO Martial Richard Guslain","MADRARU Armelle Gilda Dominique","MIN CHIU Bernard","NEKIRIAI Annick Amoura","NEKIRIAI René Waga","WACALIE épouse VAIALIMOA Rose Nassaie"],
+    'UC-FLNKS':["SAWA Pascal","TIDJINE épouse HMAE Henriette","TUTUGORO Pierre Chanel","TOURA ép. KAICHOU Jacinthe Marie-Claire","DEDANE Florentin","WAKA Maria","NEDENON Gaston","KONDOLO Josée","TEIN-TAOUVA Hervé","GOROMOTO Christiane","TYUIENON Gilbert","NORMANDON Axelle","WEMA Justin","ARAMOTO Viviane","PORIN-POUEA Jean-François","EURIBOA Marie Laure","THOVET René","HYAOUNITE épouse NAAOUTCHOUE Sephora","THAVOAVIANON Yann","ONIARY Doloresse","WAHOULO Albert","MY épouse RIMBERT Nadine","PAOLA Didier","NECHERO Jocelyne","PEBOU TIDJINE Henri Steeve","POUKINE Clarisse","NAPERAVOIN Jean Claude","NOMAI Maguy","POITHILY David","CANA Marie-Claude","MEANDU-POVEU François","DABOME Jeanne"],
+    'Faire Pays':["WAKA-AWA Maurice","DEVILLERS Vanessa","LOQUET Sylvio Jacques René","GAZENGEL Anne-Marie Géraldine","GOPOEA Clovis Tiaou","SALAÜN Therese","BERNANOS Glenn Joseph Jules","CEDARE-WIMIAN Gilline","POACOUDOU Adilio","JAMET Vayanna","COUTHY Bendjy","NEPWE-ERU Andrea","ROBERT Jean-Marc","KAREMBEU Marie-Yolande","CHEVALIER Pierre","PAITA Marie-Audrey","NAAOUTCHOUE Emiledouard","ACHIMOIN Jeanette","NOMOIGNE Menyan","LECAILLE Sabrina","FARINO Jean-Pierre","DAOUILO Elodie","ACHIMOIN Jean-Marc","KAREMBEU Ninie","PABOU Jean Gabriel","IKIARA Fabienne","POITHILI Jean-Yves","SAMOUAN Irène","PIMBE Robert","BOUYOT Jordana","SOCHOUCOE David","PIMBE Priscilla"],
+    'UNI':["NEAOUTYINE Paul","EURISOUKE Valentine","GOROMIDO Joseph","WACKENTHALER ép. FAIVRE Nadeige","BOEWE Joseph","POYMEGNA Doriane","DAHOTE Ezéckiel Wavane","NAAOUTCHOUE Sylviane","BOUTEILLER Patrice Eddy","KOKI Chérifa","KALONE Bernard Koitchélé","LAIGLE Karine","JIZDNY Vincent","OUNEMOA ép. POININE Berthe Outhey","TCHAOUNYANE Steeve","GOPOEA Astrid","VOUDJO Jean-Marc","DAHMA Eliane","POADJA Eddy","MEANDU-POVEU Anaise","QUINIOU Jean-François","TEIN ép. WENENINA Jessica","MACHORO Guy Michel","MERAY Maguy","TEPEUTA Eric Kela","WABEALO Odile","DOUNEZEK Fredy","COUIEMOIN Thérèse","PAIMBOU-POUMOINE Marcel","TEIN-BOAH Stéphanie","BERNANOS Miguel","BAOU Prescilla"]
   },
   iles:{
-    'UC-FLNKS Îles':["FORREST Mickael Joseph","WAJOKA Odri","WADEDEU Jean-Albert","BEARUNE Isabelle","YEIWENE Charles Hnaniéné","PIAA Marguerite Luatressie","TILLEWA Maurice"],
-    'PALIKA Îles':["WAHETRA Wali","LAKOREDINE Emile","HONEME Christiane","WAITRONYIE Marvin","KATRAWA Aurélia"],
-    'Nation Autochtone':["NAISSELINE Omayra Meun","CITRE Basile Cici"],
-    'Union pour construire dans le consensus':["LALIE Jacques Zanehno"],
-    "S'engager et oeuvrer pour la prospérité":["PIDRA Joann Xenie"],
-    'Baselaia':[],'Un nouveau souffle':[]
-  }
+    'PALIKA Îles':["WAHETRA Wali","LAKOREDINE Emile","HONEME Christiane","WAITRONYIE Marvin","KATRAWA Aurélia","WAMO Samuel","GOPE Aurore","HMEUN David","MALIE Jacqueline","YEIWIE David","POHLE Victoria","OUABINE Kitchine","HNAU Rimel","WAITREU Jean-Michel","BAE Diane","HNAIA Freddy","CAIHE Eliane","JOMESSY Patrick","KONYI Elisa","ADJOUHGNIOPE David","DRAWILO Jacqueline","WAHOPIE Steeve","SEIKO ép. GOPE Simone","HNACIPAN Pierre"],
+    'Un nouveau souffle':["TRENYIWA Karyl","WADRENGES ép. WAZIZI Marie-Odile, Aua","NAXUE Jean-Eric, Naxu","SIAPO Qaeko","HNAWEONGO Albert","NEHOUNE Oceane","LUEPACK Henri","MALIE Marie-Philomène","GIRAUD Wahata, Messiraïma","MAELI Waijaija","SIPA Germain","NOHIEUX Nangatro","LALIE Robert Bel","BAOUTUAU Audrey","SAIHULIWA Sinawë","BATEOU Jeanne","HMAE Antoine","MAOU Pucua, Clémentine","WAGA Ludovic","GOICE Wahone","WAMEJONENGO James","GOPE Lily, Sidraela","DJAOUA Roland","PATEL Bella"],
+    'Baselaia':["RAILATI Bilo","MAJELE Hagara","KUTU Gilbert, Jean-Marc","ANGEXETINE épouse QAHELEP Elisabeth, Abéa","DRAIKOLO Umuissie","HANYE épouse KUTU Carine, Malepou","LALIE Bernard, Waïa","CIMUTRU Hélène","HALUNE Daniel, Wiane","ELIA Wamaïe, Fiona","NENA Henri, Jovial","ELIA Constance, Cianë","MALO Jean-Pierre","WEA épouse ISSAMATRO Setha, Marie","LALIE Atrua","WEA Hélène, Geiser","OUABINE Tren, Jean","MILIE épouse ELIA Marie Rosaire","KATE Lucien, Katé","TANGOPI Catherine","CITRE Fulbert, Wadewi","BEARUNE épouse ENOKA Stéphanie","RUEURU Jean-Pierre, Alaéate","BEARUNE épouse RUEURU Céline, Léa"],
+    'Nation Autochtone':["NAISSELINE Omayra, Meun","CITRE Basile, Cici","QENENOJ Melia, Eidra","BOLO Thierry","WADRAWANE ép. WAICANE Dora Kameango","AJAPUHNYA André, Sané","WAHEA Jeannine","WHEJOINE Tom","HULIWA Watixenë Annie","SINEWAMI Jean-Louis, Buama","LUEWADIA Yvette, Inya","KAZÖNE Paul, Philippe, Puiono","BEARUNE Copane, Maggy","WASHETINE Jean-Michel, Wadewi","SCIENDI Kathy, Julia","GUAENERE Jacques, Ceni","WALLEP Virginie","PAMANI René","GAMBEY Henriette, Hariatre","AEMA Charlie, Medard","FAOUTOLO Marthe","TANGOPI Didier","WAIWE Marie-Josephine, Haicongene","WAHEA Cedrick, Ilan"],
+    'UC-FLNKS Îles':["FORREST Mickael Joseph","WAJOKA Odri","WADEDEU Jean-Albert","BEARUNE Isabelle","YEIWENE Charles Hnaniéné","PIAA Marguerite Luatressie","TILLEWA Maurice","VENDEGOU Reine","LAWI Dominique Hmeleue","KATEI Vlassa Mireille","WADIENO Robert","SONGE Catherine Yeurune","WAHEO Nelson","LAENE Marivé","QAEZE Pierre Ijoné","TOMA épouse HNACEMA Anna","WAICANE Georges","MATHA Marie","UTCHAOU Kévin Landry","POUKIOU Bessene","HUMUNIE Henri Wanéwi","DEULEU Beata","CAWIDRONE Alphonse","HNAWIA ép. WENETHEM Andrée Waijaija"],
+    'S\'engager et oeuvrer pour la prospérité':["PIDRA Joann Xenie","NEKOENG Marie-Rose","UTCHAOU Dricky","CAPOA Viviane Armande Fellah","OZIKA Zikon André","WAICANE Marie Merry","IHILY Pierre","SEIKO Sonia Waehla","WAHNAWE Franska Nemuisie","WADRENGES Anna Rose-Marie","WASSAUMI Charles","WADEWE Qabue","TEULUME Stéphane","HNAWIA Julia","TAIN Edouard","UJICAS Kareen","IXALEN Hilaire","HNAILOLO Natacha","TAOM Joseph","CIWE Marie-Christelle","UJICAS Henri Hnaccia","HNAILOLO Charlotte","TOTO Louis","HOANE Catherine"],
+    'Union pour construire dans le consensus':["LALIE Jacques Zanehno","KAOUMA EPOUSE PUJAPUJANE Henriette","KAUDRE Rene","UREGEI Henriette Sissawanaw","NGAIOHNI Charles","DUHNARA EPOUSE PALENE Dada","HULIWA Alain Fagasie","SITRITA EPOUSE AJAPUHNYA Evelyne Pinane","HNAUNE TOME Christopher","HNAWIA EPOUSE ELE-HMAEA Simone Apueri","GOPE Thomas Satim","KAOUMA EPOUSE MINDIA Malawie Marie-Julien","UEDRE Bernard Eaeat","SAIPO Sandrine Wajana","HAUDRA Jean-Paul Junior","KUGOGNE EPOUSE JEWINE Laura Yabune","QENENOJ Henri Charles","SEIKO Isabelle Honie","PIME Jerome Zozimo","WAHMOWE Solange Anne-Marie","YEIWENE Stephane Yoyeine","TIAOU EPOUSE HNAU Marie-Danielle","WENENINA Hoija Marvine","ALOSIO Fernande Manu"]
+  },
 };
 
 // ═══ CALCUL SIÈGES ═══
@@ -264,23 +207,23 @@ function getSeats(tot){
   seats.sort(function(a,b){return b.a-a.a;});return seats;
 }
 
-var svgData=[];
+var svgDataByProv={sud:[],nord:[],iles:[]};
 var majoBarData={};
 function attachSeatEvents(prov){
   var svgEl=document.getElementById('svg-'+prov);
   svgEl.querySelectorAll('.rrb-seat').forEach(function(el){
     el.addEventListener('mouseenter',function(){
-      var d=svgData[parseInt(this.getAttribute('data-i'))];
+      var d=svgDataByProv[prov][parseInt(this.getAttribute('data-i'))];
       if(d)showElu(d.prov,d.elu,d.liste,d.col,d.seats,d.isCong);
     });
     el.addEventListener('mouseleave',function(){
-      var d=svgData[parseInt(this.getAttribute('data-i'))];
+      var d=svgDataByProv[prov][parseInt(this.getAttribute('data-i'))];
       if(d)hideElu(d.prov);
     });
   });
 }
 function renderSVG(prov){
-  svgData=[];
+  svgDataByProv[prov]=[];
   var tot=TOTAL_PROV[prov],res=calcAll(prov),sp=res.prov,sc=res.cong;
   var sColors=[],sElus=[],sListes=[],sIsCong=[],sSeatsCount=[];
   ORDRE[prov].forEach(function(nom){
@@ -322,8 +265,8 @@ function renderSVG(prov){
     s+='<stop offset="100%" stop-color="#000000" stop-opacity="0.35"/></radialGradient></defs>';
     s+='<circle cx="'+x+'" cy="'+(Math.round((y+2)*10)/10)+'" r="12.5" fill="#00000030"/>';
     if(elu){
-      var di=svgData.length;
-      svgData.push({prov:prov,elu:elu,isCong:isCong,liste:liste,col:col,seats:seatCount});
+      var di=svgDataByProv[prov].length;
+      svgDataByProv[prov].push({prov:prov,elu:elu,isCong:isCong,liste:liste,col:col,seats:seatCount});
       s+='<circle cx="'+x+'" cy="'+y+'" r="12.5" fill="'+col+'" stroke="white" stroke-width="1.5" data-i="'+di+'" class="rrb-seat" style="cursor:pointer"/>';
       s+='<circle cx="'+x+'" cy="'+y+'" r="12.5" fill="url(#'+sid+')" style="pointer-events:none"/>';
     } else {
