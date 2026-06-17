@@ -215,7 +215,7 @@ function renderSVG(prov){
   var seats=getSeats(tot),HH=CY+75;
   var shown=ORDRE[prov].filter(function(n){return (sp[n]||0)>0;});
   var COLS=3,CW=268,sx=Math.floor((W-COLS*CW)/2);
-  var lr=shown.length>0?Math.ceil(shown.length/COLS):1,HSVG=HH+lr*22+30+34;
+  var lr=shown.length>0?Math.ceil(shown.length/COLS):1,HSVG=HH+lr*22+30+44;
   var s='';
   s+='<defs><linearGradient id="bg_'+prov+'" x1="0" y1="1" x2="0" y2="0">';
   s+='<stop offset="0%" stop-color="#0d2a7a" stop-opacity="0.45"/>';
@@ -224,16 +224,15 @@ function renderSVG(prov){
   s+='<rect width="'+W+'" height="'+HSVG+'" fill="white"/>';
   s+='<rect width="'+W+'" height="'+HSVG+'" fill="url(#bg_'+prov+')"/>';
   s+='<image href="'+LOGO_RRB_WM+'" x="700" y="8" width="165" height="88" opacity="0.9" preserveAspectRatio="xMidYMid meet"/>';
-  // Urne + drapeau français + "PROVINCIALES 2026"
-  s+='<g transform="translate(18,10)">';
-  s+='<rect x="0" y="14" width="34" height="26" rx="3" fill="#2d3748"/>';
-  s+='<rect x="0" y="14" width="11.3" height="26" fill="#0055A4"/>';
-  s+='<rect x="11.3" y="14" width="11.3" height="26" fill="#ffffff"/>';
-  s+='<rect x="22.6" y="14" width="11.4" height="26" fill="#EF4135"/>';
-  s+='<rect x="0" y="14" width="34" height="26" rx="3" fill="none" stroke="#1a1a1a" stroke-width="1"/>';
-  s+='<rect x="-3" y="8" width="40" height="7" rx="2" fill="#444"/>';
-  s+='<rect x="13" y="0" width="8" height="12" fill="#888" stroke="#1a1a1a" stroke-width="0.5"/>';
-  s+='<text x="42" y="22" font-family="Arial,sans-serif" font-size="11" font-weight="900" fill="#1a4dbf">PROVINCIALES</text>';
+  // Urne stylée + liseré bleu-blanc-rouge + "PROVINCIALES 2026"
+  s+='<g transform="translate(18,8)">';
+  s+='<path d="M3,12 L31,12 L27,38 Q27,41 24,41 L10,41 Q7,41 7,38 Z" fill="#f4f5f7" stroke="#cbd2dc" stroke-width="1.2"/>';
+  s+='<rect x="3" y="9" width="28" height="2.4" rx="1.2" fill="#1a2233"/>';
+  s+='<rect x="14" y="0" width="6" height="10" rx="1" fill="#9aa3b2"/>';
+  s+='<rect x="9" y="20" width="3" height="3" fill="#0055A4"/>';
+  s+='<rect x="15.5" y="20" width="3" height="3" fill="#ffffff" stroke="#e2e5ea" stroke-width="0.4"/>';
+  s+='<rect x="22" y="20" width="3" height="3" fill="#EF4135"/>';
+  s+='<text x="42" y="20" font-family="Arial,sans-serif" font-size="11" font-weight="900" fill="#1a4dbf">PROVINCIALES</text>';
   s+='<text x="42" y="34" font-family="Arial,sans-serif" font-size="11" font-weight="900" fill="#1a4dbf">2026</text>';
   s+='</g>';
   
@@ -267,20 +266,19 @@ function renderSVG(prov){
   var pt=PARTICIPATION[prov];
   if(pt>0){s+='<text x="30" y="'+(CY+12)+'" font-family="Arial,sans-serif" font-size="12" font-weight="600" fill="#555">Participation</text>';s+='<text x="30" y="'+(CY+34)+'" font-family="Arial Black,Arial,sans-serif" font-size="20" font-weight="900" fill="#1a4dbf">'+pt.toFixed(1)+' %</text>';}
   // Barre de majorité absolue (interactive au survol des listes)
-  var majoY=HH+18;
+  var majoY=HH+20;
   var majo=Math.ceil(tot/2)+1;
-  var totalSieges=Object.values(sp).reduce(function(a,b){return a+b;},0);
-  var barW=W-220, barX=160;
-  s+='<text id="majo_lbl_'+prov+'" x="40" y="'+(majoY+5)+'" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#666">Majorité absolue</text>';
-  s+='<rect x="'+barX+'" y="'+(majoY-7)+'" width="'+barW+'" height="8" rx="4" fill="#e5e9f5"/>';
-  s+='<rect id="majo_fill_'+prov+'" x="'+barX+'" y="'+(majoY-7)+'" width="0" height="8" rx="4" fill="#1a4dbf"/>';
+  var barW=W-280, barX=140;
+  s+='<text id="majo_lbl_'+prov+'" x="'+barX+'" y="'+(majoY-12)+'" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#666">Majorité absolue</text>';
+  s+='<text id="majo_txt_'+prov+'" x="'+(barX+barW)+'" y="'+(majoY-12)+'" text-anchor="end" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#e82020">'+majo+' sièges requis</text>';
+  s+='<rect x="'+barX+'" y="'+majoY+'" width="'+barW+'" height="8" rx="4" fill="#e5e9f5"/>';
+  s+='<rect id="majo_fill_'+prov+'" x="'+barX+'" y="'+majoY+'" width="0" height="8" rx="4" fill="#1a4dbf"/>';
   var markX=barX+barW*(majo/tot);
-  s+='<rect x="'+(markX-1)+'" y="'+(majoY-11)+'" width="2" height="16" fill="#e82020"/>';
-  s+='<text id="majo_txt_'+prov+'" x="'+(W-40)+'" y="'+(majoY+5)+'" text-anchor="end" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#e82020">'+majo+' sièges</text>';
+  s+='<rect x="'+(markX-1)+'" y="'+(majoY-4)+'" width="2" height="16" fill="#e82020"/>';
   majoBarData[prov]={barX:barX,barW:barW,tot:tot,majo:majo};
-  s+='<line x1="20" y1="'+(HH+34)+'" x2="'+(W-20)+'" y2="'+(HH+34)+'" stroke="#d0d8f0" stroke-width="1"/>';
-  if(shown.length>0){shown.forEach(function(nom,idx){var c=idx%COLS,row=Math.floor(idx/COLS),fx=sx+c*CW,fy=HH+49+row*22,nm=nom.length>24?nom.substring(0,24)+'…':nom,col=COULEURS[prov][nom]||GREY,sv=sp[nom]||0;s+='<circle cx="'+(fx+7)+'" cy="'+(fy-4)+'" r="7" fill="'+col+'"/><text x="'+(fx+18)+'" y="'+fy+'" font-family="Arial,sans-serif" font-size="11" fill="#333">'+nm+' <tspan font-weight="900" fill="'+col+'">'+sv+'</tspan></text>';});}
-  else{s+='<text x="'+CX+'" y="'+(HH+49)+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#bbb" font-style="italic">En attente des résultats</text>';}
+  s+='<line x1="20" y1="'+(HH+44)+'" x2="'+(W-20)+'" y2="'+(HH+44)+'" stroke="#d0d8f0" stroke-width="1"/>';
+  if(shown.length>0){shown.forEach(function(nom,idx){var c=idx%COLS,row=Math.floor(idx/COLS),fx=sx+c*CW,fy=HH+59+row*22,nm=nom.length>24?nom.substring(0,24)+'…':nom,col=COULEURS[prov][nom]||GREY,sv=sp[nom]||0;s+='<circle cx="'+(fx+7)+'" cy="'+(fy-4)+'" r="7" fill="'+col+'"/><text x="'+(fx+18)+'" y="'+fy+'" font-family="Arial,sans-serif" font-size="11" fill="#333">'+nm+' <tspan font-weight="900" fill="'+col+'">'+sv+'</tspan></text>';});}
+  else{s+='<text x="'+CX+'" y="'+(HH+59)+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#bbb" font-style="italic">En attente des résultats</text>';}
   s+='<rect id="ib_'+prov+'" x="10" y="10" width="400" height="60" rx="10" fill="#1a4dbf" opacity="0"/>';
   s+='<text id="it1_'+prov+'" x="210" y="36" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#fff" opacity="0"></text>';
   s+='<text id="it2_'+prov+'" x="210" y="56" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="900" fill="#fff" opacity="0"></text>';
@@ -358,7 +356,7 @@ function updateMajoBar(prov, seats, col, liste){
   fill.setAttribute('fill', col);
   var nm = liste.length>22?liste.substring(0,22)+'…':liste;
   lbl.textContent = nm;
-  txt.textContent = seats+' / '+d.majo+' sièges';
+  txt.textContent = seats+' / '+d.majo+' sièges requis';
   txt.setAttribute('fill', col);
 }
 function resetMajoBar(prov){
@@ -370,7 +368,7 @@ function resetMajoBar(prov){
   fill.setAttribute('width', 0);
   fill.setAttribute('fill', '#1a4dbf');
   lbl.textContent = 'Majorité absolue';
-  txt.textContent = d.majo+' sièges';
+  txt.textContent = d.majo+' sièges requis';
   txt.setAttribute('fill', '#e82020');
 }
 function toggleElus(uid){
