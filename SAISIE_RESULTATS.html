@@ -157,13 +157,8 @@ tbody td{padding:5px 8px;vertical-align:middle}
   </div>
   <div class="field" style="max-width:500px">
     <label>Personal Access Token GitHub</label>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-        oninput="saveToken()" style="flex:1">
-      <button onclick="sauvegarderFichier()" title="Génère une copie de ce fichier avec le token intégré">
-        💾 Sauvegarder dans le fichier
-      </button>
-    </div>
+    <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+      oninput="saveToken()" style="width:100%">
     <div class="hint">Settings → Developer settings → Personal access tokens → Tokens (classic) → scope : repo</div>
     <div class="token-saved" id="token-status" style="display:none">✓ Token enregistré</div>
   </div>
@@ -248,20 +243,6 @@ const OVERRIDES = {sud:{}, nord:{}, iles:{}};
 // ═══════════════════════════════════════════════════════════
 // TOKEN
 // ═══════════════════════════════════════════════════════════
-function sauvegarderFichier() {
-  const tok = document.getElementById("gh-token").value.trim();
-  if (!tok) { alert("Colle ton token d'abord."); return; }
-  let src = document.documentElement.outerHTML;
-  src = src.replace(
-    /(<input[^>]*id="gh-token"[^>]*)(placeholder="[^"]*")/,
-    function(m,p1,p2){ return p1 + 'value="' + tok + '" ' + p2; }
-  );
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([src], {type:"text/html;charset=utf-8"}));
-  a.download = "SAISIE_RESULTATS.html";
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-}
-
 function saveToken() {
   const t = document.getElementById('gh-token').value.trim();
   if (t.length > 10) {
