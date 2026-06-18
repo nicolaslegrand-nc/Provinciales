@@ -97,72 +97,14 @@
 </div>
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
-var PROVINCES_VISIBLES={sud:true,nord:false,iles:true};
-var PARTICIPATION={"sud":67.2998400686186,"nord":0,"iles":64.80194893079491};
-var EXPRIMES={sud:73235,nord:0,iles:13852};
-var SIEGES_OVERRIDE={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 17,
-    'Nous, Réunis !': 9,
-    'Un espoir pour demain': 7,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 7,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 0,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 0
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 4,
-    'PALIKA Îles': 3,
-    'Nation Autochtone': 2,
-    'Union pour construire dans le consensus': 1,
-    'S\'engager et oeuvrer pour la prospérité': 2,
-    'Baselaia': 1,
-    'Un nouveau souffle': 1
-  }
-};
+var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
+var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
+var EXPRIMES={sud:0,nord:0,iles:0};
 var VOIX_DATA={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 22750,
-    'Nous, Réunis !': 12658,
-    'Un espoir pour demain': 9356,
-    'Pour une Calédonie française': 5395,
-    'Unis pour le pays': 10437,
-    'France-Calédonie : une patrie': 3415,
-    'Kanaky pour tous': 2931,
-    'Faire Pays': 1349,
-    'Souveraineté Kanaky NC': 2108,
-    'Une province pour tous': 1490,
-    'Un autre monde est possible !': 1346
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 3873,
-    'PALIKA Îles': 2927,
-    'Nation Autochtone': 1559,
-    'Union pour construire dans le consensus': 1382,
-    'S\'engager et oeuvrer pour la prospérité': 1575,
-    'Baselaia': 1314,
-    'Un nouveau souffle': 1222
-  }
+  'sud':{'Les Loyalistes et le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
+  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
+  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
 };
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:111923,nord:41983,iles:22166};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -335,17 +277,7 @@ function renderSVG(prov){
     s+='<rect x="'+(CX-110)+'" y="'+(CY+34)+'" width="220" height="28" rx="14" fill="#fff3cc" stroke="#e8a000" stroke-width="1.5"/>';
     s+='<text x="'+CX+'" y="'+(CY+53)+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#92400e">⏳ En cours de collecte</text>';
   }
-  // Urne + PROVINCIALES 2026 au-dessus de la participation (colonne gauche libre)
-  s+='<g transform="translate(28,300)">';
-  s+='<path d="M3,12 L31,12 L27,38 Q27,41 24,41 L10,41 Q7,41 7,38 Z" fill="#f4f5f7" stroke="#cbd2dc" stroke-width="1.2"/>';
-  s+='<rect x="3" y="9" width="28" height="2.4" rx="1.2" fill="#1a2233"/>';
-  s+='<rect x="14" y="0" width="6" height="10" rx="1" fill="#9aa3b2"/>';
-  s+='<rect x="9" y="20" width="3" height="3" fill="#0055A4"/>';
-  s+='<rect x="15.5" y="20" width="3" height="3" fill="#ffffff" stroke="#e2e5ea" stroke-width="0.4"/>';
-  s+='<rect x="22" y="20" width="3" height="3" fill="#EF4135"/>';
-  s+='</g>';
-  s+='<text x="68" y="316" font-family="Arial,sans-serif" font-size="12" font-weight="900" fill="#1a4dbf">PROVINCIALES</text>';
-  s+='<text x="68" y="330" font-family="Arial,sans-serif" font-size="12" font-weight="900" fill="#1a4dbf">2026</text>';
+  // (emplacement libre au-dessus de la participation — à compléter plus tard)
   var pt=PARTICIPATION[prov];
   if(pt>0){s+='<text x="30" y="'+(CY+12)+'" font-family="Arial,sans-serif" font-size="12" font-weight="600" fill="#555">Participation</text>';s+='<text x="30" y="'+(CY+34)+'" font-family="Arial Black,Arial,sans-serif" font-size="20" font-weight="900" fill="#1a4dbf">'+pt.toFixed(1)+' %</text>';}
   // Barre de majorité absolue (interactive au survol des listes)
@@ -393,7 +325,7 @@ function renderLegende(prov){
     h+='<div class="rrb-ls">'+ps+vs+'</div>';
     h+='<span class="rrb-lseat" style="color:'+(sv>0?col:'#ccc')+'">'+(sv>0?sv:'—')+'</span></div>';
     if(elus.length>0){
-      h+='<div class="rrb-elus" id="elus-'+uid+'" style="display:none"><div class="rrb-elus-inner">';
+      h+='<div class="rrb-elus" id="elus-'+uid+'" data-prov="'+prov+'" data-seats="'+sv+'" data-col="'+col+'" data-nom="'+nom.replace(/"/g,'&quot;')+'" style="display:none"><div class="rrb-elus-inner">';
       elus.forEach(function(e,i){var badge=i<nc?'<span class="rrb-congres-badge">★ Congrès</span>':'';h+='<span class="rrb-elu"><span class="rrb-elu-num" style="background:'+col+'">'+(i+1)+'</span>'+e+badge+'</span>';});
       h+='</div></div>';
     }
@@ -410,6 +342,13 @@ function renderLegende(prov){
     el.addEventListener('mouseleave',function(){
       resetMajoBar(this.getAttribute('data-prov'));
     });
+  });
+  document.getElementById('lw-'+prov).querySelectorAll('.rrb-elus').forEach(function(el){
+    el.addEventListener('mouseenter',function(){
+      var seats=parseInt(this.getAttribute('data-seats'))||0;
+      if(seats>0) updateMajoBar(this.getAttribute('data-prov'), seats, this.getAttribute('data-col'), this.getAttribute('data-nom'));
+    });
+    el.addEventListener('mouseleave',function(){ resetMajoBar(this.getAttribute('data-prov')); });
   });
 }
 
