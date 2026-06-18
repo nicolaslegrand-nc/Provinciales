@@ -392,6 +392,7 @@ function onToggle(prov) {
   const v = document.getElementById('visible-'+prov).checked;
   document.getElementById('label-visible-'+prov).textContent =
     v ? '✅ Visible sur l\'infographie' : 'Masquée (en attente)';
+  if (typeof saveDraft === 'function') saveDraft();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -466,6 +467,7 @@ function onVoixChange(prov) {
 
   // Stocker la participation calculée pour la publication
   PARTICIPATION_CALC[prov] = participation;
+  if (typeof saveDraft === 'function') saveDraft();
 }
 
 function onSiegeChange(prov, i) {
@@ -480,6 +482,7 @@ function onSiegeChange(prov, i) {
     input.className = forced===autoVal ? 'siege-input match' : 'siege-input overridden';
   }
   updateTotalSieges(prov);
+  if (typeof saveDraft === 'function') saveDraft();
 }
 
 function updateTotalSieges(prov) {
@@ -855,19 +858,22 @@ function saveDraft() {
 function applyState(st) {
   ['sud','nord','iles'].forEach(prov => {
     const s = st[prov]; if (!s) return;
-    document.getElementById('exp-'+prov).value = s.exp||'';
-    document.getElementById('nul-'+prov).value = s.nul||'';
-    document.getElementById('blc-'+prov).value = s.blc||'';
-    document.getElementById('visible-'+prov).checked = !!s.visible;
-    LISTES[prov].forEach((l,i) => {
-      if (s.voix && s.voix[i]!==undefined) document.getElementById(`voix-${prov}-${i}`).value = s.voix[i];
-      OVERRIDES[prov][i] = s.over ? !!s.over[i] : false;
-      if (OVERRIDES[prov][i] && s.sieges && s.sieges[i]!==undefined)
-        document.getElementById(`siege-${prov}-${i}`).value = s.sieges[i];
-    });
-    onToggle(prov);
-    onVoixChange(prov);
+    try {
+      const exp=document.getElementById('exp-'+prov); if(exp) exp.value = s.exp||'';
+      const nul=document.getElementById('nul-'+prov); if(nul) nul.value = s.nul||'';
+      const blc=document.getElementById('blc-'+prov); if(blc) blc.value = s.blc||'';
+      const vis=document.getElementById('visible-'+prov); if(vis) vis.checked = !!s.visible;
+      LISTES[prov].forEach((l,i) => {
+        const vx=document.getElementById(`voix-${prov}-${i}`);
+        if (vx && s.voix && s.voix[i]!==undefined) vx.value = s.voix[i];
+        OVERRIDES[prov][i] = s.over ? !!s.over[i] : false;
+        const sg=document.getElementById(`siege-${prov}-${i}`);
+        if (sg && OVERRIDES[prov][i] && s.sieges && s.sieges[i]!==undefined) sg.value = s.sieges[i];
+      });
+    } catch(e){}
   });
+  // Recalcul (badges, sièges, participation) — protégé, n'efface pas les valeurs déjà posées
+  ['sud','nord','iles'].forEach(prov => { try { onToggle(prov); onVoixChange(prov); } catch(e){} });
 }
 
 function restoreDraft() {
@@ -923,10 +929,12 @@ async function loadPublishedFromGitHub(manuel) {
 }
 
 function autosaveSetup() {
-  let t;
-  const h = () => { clearTimeout(t); t = setTimeout(saveDraft, 400); };
+  const h = () => saveDraft();
   document.addEventListener('input', h);
   document.addEventListener('change', h);
+  // Filet supplémentaire : on sauvegarde juste avant un F5 / une fermeture d'onglet
+  window.addEventListener('beforeunload', saveDraft);
+  window.addEventListener('pagehide', saveDraft);
 }
 
 ['sud','nord','iles'].forEach(initPanel);
@@ -934,7 +942,9 @@ afficherDernierePublication();
 autosaveSetup();
 // Au chargement : un brouillon local (survit au F5) est prioritaire ;
 // sinon on relit les dernières valeurs publiées sur GitHub (survit au vidage de cache).
-if (!restoreDraft()) { loadPublishedFromGitHub(false); }
+let __hasDraft=false;
+try { __hasDraft = !!localStorage.getItem(DRAFT_KEY); } catch(e){}
+if (__hasDraft) { restoreDraft(); } else { loadPublishedFromGitHub(false); }
 </script>
 </body>
 </html>
