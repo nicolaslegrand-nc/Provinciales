@@ -270,7 +270,7 @@ function renderSVG(prov){
       s+='<circle cx="'+x+'" cy="'+y+'" r="12.5" fill="url(#'+sid+')" style="pointer-events:none"/>';
     }
   });
-  s+='<text x="'+CX+'" y="'+(CY-8)+'" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="52" font-weight="900" fill="#111">'+tot+'</text>';
+  s+='<text id="count_'+prov+'" x="'+CX+'" y="'+(CY-8)+'" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="52" font-weight="900" fill="#111">'+tot+'</text>';
   s+='<text x="'+CX+'" y="'+(CY+18)+'" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#888" letter-spacing="4">SIÈGES</text>';
   var hasVoix=Object.values(VOIX_DATA[prov]).some(function(v){return v>0;});
   if(!hasVoix){
@@ -395,6 +395,7 @@ function updateMajoBar(prov, seats, col, liste){
   if(nameEl){ nameEl.textContent = nm; nameEl.setAttribute('fill', col); }
   txt.textContent = seats+' / '+d.majo+' sièges requis';
   txt.setAttribute('fill', '#555');
+  var cnt=document.getElementById('count_'+prov); if(cnt){ cnt.textContent=seats; cnt.setAttribute('fill',col); }
 }
 function resetMajoBar(prov){
   var d=majoBarData[prov]; if(!d) return;
@@ -405,6 +406,7 @@ function resetMajoBar(prov){
   fill.setAttribute('width', 0);
   fill.setAttribute('fill', '#1a4dbf');
   var nameEl=document.getElementById('majo_name_'+prov); if(nameEl) nameEl.textContent='';
+  var cnt=document.getElementById('count_'+prov); if(cnt){ cnt.textContent=d.tot; cnt.setAttribute('fill','#111'); }
   lbl.textContent = 'Majorité absolue';
   txt.textContent = d.majo+' sièges requis';
   txt.setAttribute('fill', '#555');
