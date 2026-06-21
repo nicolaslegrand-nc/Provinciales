@@ -48,6 +48,9 @@
 .rrb-lv{font-size:.78rem!important;color:#888!important;display:block!important;margin:0!important}
 .rrb-lseat{font-size:1.4rem!important;font-weight:900!important;text-align:right!important;display:block!important;margin:0!important}
 .rrb-elus{overflow:hidden!important;margin:0!important}
+.rrb-medslot{display:flex!important;align-items:center!important;justify-content:center!important}
+.rrb-lr-open{grid-template-columns:4px 0 1fr auto 44px!important}
+.rrb-lr-open .rrb-medslot{visibility:hidden!important;width:0!important;overflow:hidden!important}
 .rrb-elus-inner{padding:12px 12px 14px!important;background:#f8faff!important;border-top:1px solid #e5e7eb!important;display:flex!important;flex-wrap:nowrap!important;align-items:flex-start!important;gap:14px!important;margin:0!important}
 .rrb-elus-med{flex-shrink:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:6px!important;width:104px!important;margin:0!important}
 .rrb-elus-medimg{width:90px!important;height:90px!important;border-radius:50%!important;object-fit:cover!important;border:3px solid #ccc!important;background:#eef2ff!important;display:block!important}
@@ -105,72 +108,14 @@
 </div>
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
-var PROVINCES_VISIBLES={sud:true,nord:true,iles:true};
-var PARTICIPATION={"sud":67.2998400686186,"nord":71.50036919705595,"iles":64.80194893079491};
-var EXPRIMES={sud:73235,nord:29091,iles:13852};
-var SIEGES_OVERRIDE={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 17,
-    'Nous, Réunis !': 9,
-    'Un espoir pour demain': 7,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 7,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 0,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 0
-  },
-  'nord':{
-    'UC-FLNKS': 7,
-    'UNI': 6,
-    'Alternative Nord pour un pays souverain': 4,
-    'Faire Pays': 3,
-    'Agissons ensemble pour le Nord': 2
-  },
-  'iles':{
-    'UC-FLNKS Îles': 4,
-    'PALIKA Îles': 3,
-    'Nation Autochtone': 2,
-    'Union pour construire dans le consensus': 1,
-    'S\'engager et oeuvrer pour la prospérité': 2,
-    'Baselaia': 1,
-    'Un nouveau souffle': 1
-  }
-};
+var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
+var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
+var EXPRIMES={sud:0,nord:0,iles:0};
 var VOIX_DATA={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 22750,
-    'Nous, Réunis !': 12658,
-    'Un espoir pour demain': 9356,
-    'Pour une Calédonie française': 5395,
-    'Unis pour le pays': 10437,
-    'France-Calédonie : une patrie': 3415,
-    'Kanaky pour tous': 2931,
-    'Faire Pays': 1349,
-    'Souveraineté Kanaky NC': 2108,
-    'Une province pour tous': 1490,
-    'Un autre monde est possible !': 1346
-  },
-  'nord':{
-    'UC-FLNKS': 8932,
-    'UNI': 7801,
-    'Alternative Nord pour un pays souverain': 5406,
-    'Faire Pays': 3760,
-    'Agissons ensemble pour le Nord': 3192
-  },
-  'iles':{
-    'UC-FLNKS Îles': 3873,
-    'PALIKA Îles': 2927,
-    'Nation Autochtone': 1559,
-    'Union pour construire dans le consensus': 1382,
-    'S\'engager et oeuvrer pour la prospérité': 1575,
-    'Baselaia': 1314,
-    'Un nouveau souffle': 1222
-  }
+  'sud':{'Les Loyalistes et le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
+  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
+  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
 };
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:111923,nord:41983,iles:22166};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -386,11 +331,13 @@ function renderLegende(prov){
     var vs=v>0?('<span class="rrb-lv">'+v.toLocaleString('fr-FR')+' voix</span>'):'';
     var cur=elus.length>0?'cursor:pointer':'';
     var dim=sv===0&&v>0?'opacity:0.45;':'';
-    h+='<div class="rrb-lr rrb-lr-hover" data-prov="'+prov+'" data-seats="'+sv+'" data-col="'+col+'" data-nom="'+nom.replace(/"/g,'&quot;')+'" style="border-left:4px solid '+col+'!important;'+cur+dim+'"'+(elus.length>0?' onclick="toggleElus(\''+uid+'\' )"':'')+' >';
+    h+='<div class="rrb-lr rrb-lr-hover" id="lr-'+uid+'" data-prov="'+prov+'" data-seats="'+sv+'" data-col="'+col+'" data-nom="'+nom.replace(/"/g,'&quot;')+'" style="border-left:4px solid '+col+'!important;'+cur+dim+'"'+(elus.length>0?' onclick="toggleElus(\''+uid+'\' )"':'')+' >';
     h+='<span class="rrb-lc" style="background:'+col+'"></span>';
     var ph=(typeof PHOTOS_TL!=='undefined'&&PHOTOS_TL[prov]&&PHOTOS_TL[prov][nom])?PHOTOS_TL[prov][nom]:'';
-    if(ph){ h+='<img class="rrb-med" src="'+ph+'" alt="" style="border-color:'+col+'">'; }
-    else { var ini=(head||'').split(/[\s\-]+/).filter(Boolean).slice(0,2).map(function(w){return w.charAt(0);}).join('').toUpperCase(); h+='<span class="rrb-med rrb-med-ini" style="border-color:'+col+';background:'+col+'">'+ini+'</span>'; }
+    h+='<span class="rrb-medslot">';
+    if(ph){ h+='<img class="rrb-med rrb-med-ph" src="'+ph+'" alt="" style="border-color:'+col+'">'; }
+    else { var ini=(head||'').split(/[\s\-]+/).filter(Boolean).slice(0,2).map(function(w){return w.charAt(0);}).join('').toUpperCase(); h+='<span class="rrb-med rrb-med-ini rrb-med-ph" style="border-color:'+col+';background:'+col+'">'+ini+'</span>'; }
+    h+='</span>';
     h+='<div class="rrb-li"><span class="rrb-ln">'+nom+(elus.length>0?' <span class="rrb-arrow" id="arr-'+uid+'">▶</span>':'')+'</span><span class="rrb-lh">'+head+'</span></div>';
     h+='<div class="rrb-ls">'+ps+vs+'</div>';
     h+='<span class="rrb-lseat" style="color:'+(sv>0?col:'#ccc')+'">'+(sv>0?sv:'—')+'</span></div>';
@@ -482,10 +429,11 @@ function resetMajoBar(prov){
   txt.setAttribute('fill', '#555');
 }
 function toggleElus(uid){
-  var el=document.getElementById('elus-'+uid),arr=document.getElementById('arr-'+uid);
+  var el=document.getElementById('elus-'+uid),arr=document.getElementById('arr-'+uid),row=document.getElementById('lr-'+uid);
   if(!el)return;var open=el.style.display!=='none';
   el.style.display=open?'none':'block';
   if(arr)arr.classList.toggle('open',!open);
+  if(row)row.classList.toggle('rrb-lr-open',!open);
 }
 
 // ═══ NAVIGATION ═══
