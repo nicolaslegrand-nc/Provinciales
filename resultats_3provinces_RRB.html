@@ -48,14 +48,19 @@
 .rrb-lv{font-size:.78rem!important;color:#888!important;display:block!important;margin:0!important}
 .rrb-lseat{font-size:1.4rem!important;font-weight:900!important;text-align:right!important;display:block!important;margin:0!important}
 .rrb-elus{overflow:hidden!important;margin:0!important}
-.rrb-elus-inner{padding:8px 12px 10px!important;background:#f8faff!important;border-top:1px solid #e5e7eb!important;display:flex!important;flex-wrap:wrap!important;gap:6px!important;margin:0!important}
+.rrb-elus-inner{padding:12px 12px 14px!important;background:#f8faff!important;border-top:1px solid #e5e7eb!important;display:flex!important;flex-wrap:nowrap!important;align-items:flex-start!important;gap:14px!important;margin:0!important}
+.rrb-elus-med{flex-shrink:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:6px!important;width:104px!important;margin:0!important}
+.rrb-elus-medimg{width:90px!important;height:90px!important;border-radius:50%!important;object-fit:cover!important;border:3px solid #ccc!important;background:#eef2ff!important;display:block!important}
+.rrb-elus-medini{display:flex!important;align-items:center!important;justify-content:center!important;color:#fff!important;font-size:1.5rem!important;font-weight:800!important;letter-spacing:.5px!important}
+.rrb-elus-medcap{font-size:.7rem!important;font-weight:700!important;color:#333!important;text-align:center!important;line-height:1.2!important;margin:0!important}
+.rrb-elus-names{display:flex!important;flex-wrap:wrap!important;gap:6px!important;flex:1!important;min-width:0!important;align-content:flex-start!important}
 .rrb-elu{display:flex!important;align-items:center!important;gap:5px!important;font-size:.73rem!important;color:#333!important;background:#fff!important;border:1px solid #e5e7eb!important;border-radius:20px!important;padding:3px 8px 3px 4px!important;margin:0!important}
 .rrb-elu-num{width:18px!important;height:18px!important;border-radius:50%!important;color:#fff!important;font-size:.6rem!important;font-weight:700!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;margin:0!important}
 .rrb-congres-badge{font-size:.55rem!important;font-weight:700!important;color:#92400e!important;background:#fff3cc!important;border:1px solid #e8a000!important;border-radius:3px!important;padding:1px 4px!important;margin-left:4px!important;white-space:nowrap!important;flex-shrink:0!important}
 .rrb-footer{margin:28px 0 0!important;font-size:.65rem!important;color:#aaa!important;text-align:center!important;padding:12px 0 0!important;max-width:900px!important;width:100%!important;border-top:1px solid #d0d8f0!important;display:block!important}
 .rrb-export-btn{background:#fff!important;border:1px solid #d0d8f0!important;color:#1a4dbf!important;font-size:.72rem!important;font-weight:700!important;padding:7px 16px!important;border-radius:18px!important;cursor:pointer!important;transition:background .15s!important}
 .rrb-export-btn:hover{background:#f0f4fa!important}
-@media(max-width:600px){.rrb-tab{padding:10px 4px!important}.rrb-tl{font-size:.7rem!important}.rrb-tc{font-size:.58rem!important}.rrb-lr{gap:6px!important;padding:8px 10px!important}.rrb-lseat{font-size:1.1rem!important}}
+@media(max-width:600px){.rrb-tab{padding:10px 4px!important}.rrb-tl{font-size:.7rem!important}.rrb-tc{font-size:.58rem!important}.rrb-lr{gap:6px!important;padding:8px 10px!important}.rrb-lseat{font-size:1.1rem!important}.rrb-elus-inner{gap:10px!important}.rrb-elus-med{width:74px!important}.rrb-elus-medimg{width:64px!important;height:64px!important}.rrb-elus-medini{font-size:1.1rem!important}.rrb-elus-medcap{font-size:.62rem!important}}
 </style>
 </head>
 <body>
@@ -100,72 +105,14 @@
 </div>
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
-var PROVINCES_VISIBLES={sud:true,nord:true,iles:true};
-var PARTICIPATION={"sud":67.2998400686186,"nord":71.50036919705595,"iles":64.80194893079491};
-var EXPRIMES={sud:73235,nord:29091,iles:13852};
-var SIEGES_OVERRIDE={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 17,
-    'Nous, Réunis !': 9,
-    'Un espoir pour demain': 7,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 7,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 0,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 0
-  },
-  'nord':{
-    'UC-FLNKS': 7,
-    'UNI': 6,
-    'Alternative Nord pour un pays souverain': 4,
-    'Faire Pays': 3,
-    'Agissons ensemble pour le Nord': 2
-  },
-  'iles':{
-    'UC-FLNKS Îles': 4,
-    'PALIKA Îles': 3,
-    'Nation Autochtone': 2,
-    'Union pour construire dans le consensus': 1,
-    'S\'engager et oeuvrer pour la prospérité': 2,
-    'Baselaia': 1,
-    'Un nouveau souffle': 1
-  }
-};
+var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
+var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
+var EXPRIMES={sud:0,nord:0,iles:0};
 var VOIX_DATA={
-  'sud':{
-    'Les Loyalistes et le Rassemblement': 22750,
-    'Nous, Réunis !': 12658,
-    'Un espoir pour demain': 9356,
-    'Pour une Calédonie française': 5395,
-    'Unis pour le pays': 10437,
-    'France-Calédonie : une patrie': 3415,
-    'Kanaky pour tous': 2931,
-    'Faire Pays': 1349,
-    'Souveraineté Kanaky NC': 2108,
-    'Une province pour tous': 1490,
-    'Un autre monde est possible !': 1346
-  },
-  'nord':{
-    'UC-FLNKS': 8932,
-    'UNI': 7801,
-    'Alternative Nord pour un pays souverain': 5406,
-    'Faire Pays': 3760,
-    'Agissons ensemble pour le Nord': 3192
-  },
-  'iles':{
-    'UC-FLNKS Îles': 3873,
-    'PALIKA Îles': 2927,
-    'Nation Autochtone': 1559,
-    'Union pour construire dans le consensus': 1382,
-    'S\'engager et oeuvrer pour la prospérité': 1575,
-    'Baselaia': 1314,
-    'Un nouveau souffle': 1222
-  }
+  'sud':{'Les Loyalistes et le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
+  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
+  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
 };
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:111923,nord:41983,iles:22166};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -391,8 +338,11 @@ function renderLegende(prov){
     h+='<span class="rrb-lseat" style="color:'+(sv>0?col:'#ccc')+'">'+(sv>0?sv:'—')+'</span></div>';
     if(elus.length>0){
       h+='<div class="rrb-elus" id="elus-'+uid+'" data-prov="'+prov+'" data-seats="'+sv+'" data-col="'+col+'" data-nom="'+nom.replace(/"/g,'&quot;')+'" style="display:none"><div class="rrb-elus-inner">';
+      if(ph){ h+='<div class="rrb-elus-med"><img class="rrb-elus-medimg" src="'+ph+'" alt="" style="border-color:'+col+'"><span class="rrb-elus-medcap">'+head+'</span></div>'; }
+      else { var iniB=(head||'').split(/[\s\-]+/).filter(Boolean).slice(0,2).map(function(w){return w.charAt(0);}).join('').toUpperCase(); h+='<div class="rrb-elus-med"><span class="rrb-elus-medimg rrb-elus-medini" style="border-color:'+col+';background:'+col+'">'+iniB+'</span><span class="rrb-elus-medcap">'+head+'</span></div>'; }
+      h+='<div class="rrb-elus-names">';
       elus.forEach(function(e,i){var badge=i<nc?'<span class="rrb-congres-badge">★ Congrès</span>':'';h+='<span class="rrb-elu"><span class="rrb-elu-num" style="background:'+col+'">'+(i+1)+'</span>'+e+badge+'</span>';});
-      h+='</div></div>';
+      h+='</div></div></div>';
     }
   });
   document.getElementById('lw-'+prov).innerHTML=h;
