@@ -171,12 +171,6 @@ tbody td{padding:5px 8px;vertical-align:middle}
   <button class="tab-btn" onclick="switchTab('iles',this)">🟠 Îles Loyauté</button>
 </div>
 
-<div style="text-align:right;margin:8px 0">
-  <button onclick="remplirSimulationTest()" style="background:none;border:1px solid #ccc;color:#888;font-size:.72rem;padding:5px 10px;border-radius:6px;cursor:pointer">
-    🧪 Remplir avec des voix de test (3 provinces)
-  </button>
-</div>
-
 <div class="panel active" id="panel-sud"></div>
 <div class="panel" id="panel-nord"></div>
 <div class="panel" id="panel-iles"></div>
@@ -212,8 +206,16 @@ tbody td{padding:5px 8px;vertical-align:middle}
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const INSCRITS = {sud:111923, nord:41983, iles:22166};
+const INSCRITS = {sud:127474, nord:43016, iles:22094};   // inscrits LESP définitifs — en dur
 const TOTAL_SIEGES = {sud:40, nord:22, iles:14};
+// Ajustement manuel des inscrits (changement de dernière minute) : lu dans le champ "ajust-<prov>".
+// Inscrits effectifs = inscrits en dur ± ajustement.
+function getInscrits(prov){
+  const el = document.getElementById('ajust-'+prov);
+  const v = el ? parseInt(el.value) : NaN;
+  return (isNaN(v) || v<=0) ? INSCRITS[prov] : v;
+}
+function getSeuil(prov){ return Math.ceil(getInscrits(prov) * 0.05); }
 const FICHIERS = {
   prov: 'resultats_3provinces_RRB.html',
   cong: 'congres_RRB.html',
@@ -236,7 +238,7 @@ function base64ToUtf8(b64) {
 
 const LISTES = {
   sud:[
-    {nom:'Les Loyalistes et le Rassemblement', head:'Sonia BACKÈS',       color:'#1a4dbf'},
+    {nom:'Les Loyalistes - le Rassemblement', head:'Sonia BACKÈS',       color:'#1a4dbf'},
     {nom:'Nous, Réunis !',                     head:'Philippe DUNOYER',   color:'#3498db'},
     {nom:'Un espoir pour demain',               head:'Pascal LAFLEUR',     color:'#9b59b6'},
     {nom:'Pour une Calédonie française',        head:'Arnold LÈQUES',      color:'#0099cc'},
@@ -308,7 +310,7 @@ function calcSieges(voixDict, totalSieges, seuilMin) {
 // INIT PANELS
 // ═══════════════════════════════════════════════════════════
 function initPanel(prov) {
-  const seuil = Math.ceil(INSCRITS[prov] * 0.05);
+  const seuil = getSeuil(prov);
   const labels = {sud:'Province Sud — 40 sièges', nord:'Province Nord — 22 sièges', iles:'Îles Loyauté — 14 sièges'};
 
   const rows = LISTES[prov].map((l,i) => `
@@ -358,7 +360,11 @@ function initPanel(prov) {
       </div>
       <div class="row-2">
         <div class="field">
-          <div class="hint" style="margin-top:0">Inscrits : ${INSCRITS[prov].toLocaleString('fr-FR')} · Seuil : ${seuil.toLocaleString('fr-FR')} voix</div>
+          <label>Inscrits LESP <span style="font-weight:400;color:#aaa">— modifiable si changement de dernière minute</span></label>
+          <input type="number" id="ajust-${prov}" value="${INSCRITS[prov]}" min="1"
+            title="Nombre d'inscrits utilisé pour le seuil 5% et la participation — modifiable à la main"
+            oninput="onInscritsAdjust('${prov}')" style="max-width:160px">
+          <div class="hint" id="inscrits-hint-${prov}" style="margin-top:4px">Inscrits : ${getInscrits(prov).toLocaleString('fr-FR')} · Seuil : ${seuil.toLocaleString('fr-FR')} voix</div>
           <div id="partcalc-${prov}" style="margin-top:6px;font-size:.85rem;font-weight:700;color:#1a4dbf"></div>
         </div>
         <div class="field">
@@ -395,11 +401,17 @@ function onToggle(prov) {
   if (typeof saveDraft === 'function') saveDraft();
 }
 
+function onInscritsAdjust(prov) {
+  const hint = document.getElementById('inscrits-hint-'+prov);
+  if (hint) hint.textContent = `Inscrits : ${getInscrits(prov).toLocaleString('fr-FR')} · Seuil : ${getSeuil(prov).toLocaleString('fr-FR')} voix`;
+  onVoixChange(prov);
+}
+
 // ═══════════════════════════════════════════════════════════
 // CHANGEMENT VOIX
 // ═══════════════════════════════════════════════════════════
 function onVoixChange(prov) {
-  const seuil = Math.ceil(INSCRITS[prov] * 0.05);
+  const seuil = getSeuil(prov);
   const voixDict = {};
   let totalVoix = 0;
 
@@ -442,11 +454,12 @@ function onVoixChange(prov) {
   const nuls = parseInt(document.getElementById('nul-'+prov).value)||0;
   const blancs = parseInt(document.getElementById('blc-'+prov).value)||0;
   const votants = exprimes + nuls + blancs;
-  const participation = votants>0 ? (votants/INSCRITS[prov]*100) : 0;
+  const inscritsEff = getInscrits(prov);
+  const participation = votants>0 ? (votants/inscritsEff*100) : 0;
 
   const partCalcDiv = document.getElementById('partcalc-'+prov);
   if (votants>0) {
-    partCalcDiv.innerHTML = `Participation : ${participation.toFixed(2)} % &nbsp;<span style="color:#888;font-weight:400">(${votants.toLocaleString('fr-FR')} votants / ${INSCRITS[prov].toLocaleString('fr-FR')} inscrits)</span>`;
+    partCalcDiv.innerHTML = `Participation : ${participation.toFixed(2)} % &nbsp;<span style="color:#888;font-weight:400">(${votants.toLocaleString('fr-FR')} votants / ${inscritsEff.toLocaleString('fr-FR')} inscrits)</span>`;
   } else {
     partCalcDiv.innerHTML = '';
   }
@@ -520,11 +533,12 @@ function switchTab(prov, btn) {
 // LIRE CONFIG
 // ═══════════════════════════════════════════════════════════
 function getConfig() {
-  const cfg = {visible:{},participation:{},exprimes:{},voix:{},sieges:{}};
+  const cfg = {visible:{},participation:{},exprimes:{},inscrits:{},voix:{},sieges:{}};
   ['sud','nord','iles'].forEach(prov => {
     cfg.visible[prov] = document.getElementById('visible-'+prov).checked;
     cfg.participation[prov] = PARTICIPATION_CALC[prov]||0;
     cfg.exprimes[prov] = parseInt(document.getElementById('exp-'+prov).value)||0;
+    cfg.inscrits[prov] = getInscrits(prov);
     cfg.voix[prov]={}; cfg.sieges[prov]={};
     LISTES[prov].forEach((l,i) => {
       cfg.voix[prov][l.nom] = parseInt(document.getElementById(`voix-${prov}-${i}`).value)||0;
@@ -536,6 +550,7 @@ function getConfig() {
 
 function buildJS(cfg) {
   const visibleJS = `var PROVINCES_VISIBLES={sud:${cfg.visible.sud},nord:${cfg.visible.nord},iles:${cfg.visible.iles}};`;
+  const inscritsJS = `var INSCRITS={sud:${cfg.inscrits.sud},nord:${cfg.inscrits.nord},iles:${cfg.inscrits.iles}};`;
   const participationJS = `var PARTICIPATION={"sud":${cfg.participation.sud},"nord":${cfg.participation.nord},"iles":${cfg.participation.iles}};`;
   const exprimesJS = `var EXPRIMES={sud:${cfg.exprimes.sud},nord:${cfg.exprimes.nord},iles:${cfg.exprimes.iles}};`;
   const escName = n => n.replace(/'/g, "\\'");
@@ -543,11 +558,13 @@ function buildJS(cfg) {
   const voixJS = `var VOIX_DATA={\n  'sud':{\n${vl('sud')}\n  },\n  'nord':{\n${vl('nord')}\n  },\n  'iles':{\n${vl('iles')}\n  }\n};`;
   const sl = prov => Object.entries(cfg.sieges[prov]).map(([n,v])=>`    '${escName(n)}': ${v}`).join(',\n');
   const siegesJS = `var SIEGES_OVERRIDE={\n  'sud':{\n${sl('sud')}\n  },\n  'nord':{\n${sl('nord')}\n  },\n  'iles':{\n${sl('iles')}\n  }\n};`;
-  return {visibleJS, participationJS, exprimesJS, voixJS, siegesJS};
+  return {visibleJS, inscritsJS, participationJS, exprimesJS, voixJS, siegesJS};
 }
 
 function injecterHTML(html, js) {
   html = html.replace(/var PROVINCES_VISIBLES=\{[^}]+\};/, js.visibleJS);
+  if (html.includes('var INSCRITS='))
+    html = html.replace(/var INSCRITS=\{[^}]+\};/, js.inscritsJS);
   html = html.replace(/var PARTICIPATION=\{[^}]+\};/, js.participationJS);
   if (html.includes('var EXPRIMES='))
     html = html.replace(/var EXPRIMES=\{[^}]+\};/, js.exprimesJS);
@@ -759,68 +776,8 @@ function reinitialiserTout() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// REMPLISSAGE RAPIDE POUR TESTS (chiffres fictifs)
+// TÉLÉCHARGEMENT (fallback sans GitHub)
 // ═══════════════════════════════════════════════════════════
-function remplirSimulationTest() {
-  if (!confirm("Remplir les 3 provinces avec des voix FICTIVES de test ? À utiliser uniquement pour vérifier que tout fonctionne, jamais le soir des vrais résultats.")) return;
-
-  const SIM = {
-    sud: {
-      exprimes: 73235, nuls: 940, blancs: 1149,
-      voix: {
-        'Les Loyalistes et le Rassemblement': 22750,
-        'Nous, Réunis !': 12658,
-        'Unis pour le pays': 10437,
-        'Un espoir pour demain': 9356,
-        'Pour une Calédonie française': 5395,
-        'France-Calédonie : une patrie': 3415,
-        'Kanaky pour tous': 2931,
-        'Souveraineté Kanaky NC': 2108,
-        'Une province pour tous': 1490,
-        'Un autre monde est possible !': 1346,
-        'Faire Pays': 1349,
-      }
-    },
-    nord: {
-      exprimes: 29091, nuls: 282, blancs: 645,
-      voix: {
-        'UC-FLNKS': 8932,
-        'UNI': 7801,
-        'Alternative Nord pour un pays souverain': 5406,
-        'Faire Pays': 3760,
-        'Agissons ensemble pour le Nord': 3192,
-      }
-    },
-    iles: {
-      exprimes: 13852, nuls: 196, blancs: 316,
-      voix: {
-        'UC-FLNKS Îles': 3873,
-        'PALIKA Îles': 2927,
-        "S'engager et oeuvrer pour la prospérité": 1575,
-        'Nation Autochtone': 1559,
-        'Union pour construire dans le consensus': 1382,
-        'Baselaia': 1314,
-        'Un nouveau souffle': 1222,
-      }
-    }
-  };
-
-  ['sud','nord','iles'].forEach(prov => {
-    document.getElementById('exp-'+prov).value = SIM[prov].exprimes;
-    document.getElementById('nul-'+prov).value = SIM[prov].nuls;
-    document.getElementById('blc-'+prov).value = SIM[prov].blancs;
-    document.getElementById('visible-'+prov).checked = true;
-    onToggle(prov);
-    LISTES[prov].forEach((l,i) => {
-      const v = SIM[prov].voix[l.nom] || 0;
-      document.getElementById(`voix-${prov}-${i}`).value = v;
-    });
-    onVoixChange(prov);
-  });
-
-  document.getElementById('alerts-pub').innerHTML = '<div class="alert info">🧪 Voix de test chargées pour les 3 provinces — clique sur \"Publier\" pour tester le cycle complet.</div>';
-}
-
 function telechargerFichiers() {
   document.getElementById('alerts-pub').innerHTML =
     '<div class="alert info">ℹ️ Pour télécharger les fichiers, ils doivent être dans le même dossier que cette interface. Utilise "Publier sur GitHub" pour la mise à jour directe.</div>';
@@ -830,13 +787,14 @@ function telechargerFichiers() {
 // ═══════════════════════════════════════════════════════════
 // PERSISTANCE — anti-F5 (sauvegarde locale) + anti-vidage de cache (relecture GitHub)
 // ═══════════════════════════════════════════════════════════
-const DRAFT_KEY = 'rrb_saisie_draft_v1';
+const DRAFT_KEY = 'rrb_saisie_draft_v2';
 
 function collectState() {
   const st = {};
   ['sud','nord','iles'].forEach(prov => {
     st[prov] = {
       visible: document.getElementById('visible-'+prov).checked,
+      ajust: document.getElementById('ajust-'+prov).value,
       exp: document.getElementById('exp-'+prov).value,
       nul: document.getElementById('nul-'+prov).value,
       blc: document.getElementById('blc-'+prov).value,
@@ -859,6 +817,7 @@ function applyState(st) {
   ['sud','nord','iles'].forEach(prov => {
     const s = st[prov]; if (!s) return;
     try {
+      const aj=document.getElementById('ajust-'+prov); if(aj) aj.value = (s.ajust!==undefined && s.ajust!=='') ? s.ajust : INSCRITS[prov];
       const exp=document.getElementById('exp-'+prov); if(exp) exp.value = s.exp||'';
       const nul=document.getElementById('nul-'+prov); if(nul) nul.value = s.nul||'';
       const blc=document.getElementById('blc-'+prov); if(blc) blc.value = s.blc||'';
@@ -872,8 +831,8 @@ function applyState(st) {
       });
     } catch(e){}
   });
-  // Recalcul (badges, sièges, participation) — protégé, n'efface pas les valeurs déjà posées
-  ['sud','nord','iles'].forEach(prov => { try { onToggle(prov); onVoixChange(prov); } catch(e){} });
+  // Recalcul (badges, sièges, participation, hint inscrits) — protégé, n'efface pas les valeurs déjà posées
+  ['sud','nord','iles'].forEach(prov => { try { onToggle(prov); onInscritsAdjust(prov); } catch(e){} });
 }
 
 function restoreDraft() {
@@ -886,9 +845,11 @@ function restoreDraft() {
 function parsePublished(html) {
   function grab(re){ const m = html.match(re); return m ? m[0] : ''; }
   const code = grab(/var PROVINCES_VISIBLES=\{[^}]+\};/) + '\n'
+             + grab(/var INSCRITS=\{[^}]+\};/) + '\n'
              + grab(/var EXPRIMES=\{[^}]+\};/) + '\n'
              + grab(/var VOIX_DATA=\{[\s\S]*?\n\};/) + '\n'
              + 'return {PV:(typeof PROVINCES_VISIBLES!=="undefined")?PROVINCES_VISIBLES:null,'
+             + 'IN:(typeof INSCRITS!=="undefined")?INSCRITS:null,'
              + 'EX:(typeof EXPRIMES!=="undefined")?EXPRIMES:null,'
              + 'VD:(typeof VOIX_DATA!=="undefined")?VOIX_DATA:null};';
   try { return (new Function(code))(); } catch(e) { return null; }
@@ -914,6 +875,9 @@ async function loadPublishedFromGitHub(manuel) {
   if (!data || !data.VD) { if (manuel) alert("Fichier publié illisible."); return false; }
   ['sud','nord','iles'].forEach(prov => {
     if (data.PV) document.getElementById('visible-'+prov).checked = !!data.PV[prov];
+    if (data.IN && data.IN[prov]!==undefined && data.IN[prov]>0) {
+      document.getElementById('ajust-'+prov).value = data.IN[prov];
+    }
     if (data.EX && data.EX[prov]!==undefined && data.EX[prov]>0) document.getElementById('exp-'+prov).value = data.EX[prov];
     LISTES[prov].forEach((l,i) => {
       const v = data.VD[prov] && data.VD[prov][l.nom];
@@ -921,7 +885,7 @@ async function loadPublishedFromGitHub(manuel) {
       OVERRIDES[prov][i] = false;
     });
     onToggle(prov);
-    onVoixChange(prov);
+    onInscritsAdjust(prov);
   });
   saveDraft();
   if (manuel) document.getElementById('alerts-pub').innerHTML = `<div class="alert info">↻ Valeurs rechargées depuis la dernière publication sur GitHub. (Les Nuls/Blancs ne sont pas stockés en ligne — à ressaisir si besoin pour la participation.)</div>`;
