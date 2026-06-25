@@ -598,7 +598,26 @@ async function githubGetFile(token, user, repo, fichier) {
   return r.json();
 }
 
+// Lecture robuste du contenu : l'API Contents ne renvoie le base64 inline que
+// jusqu'à 1 Mo. Au-delà, file.content est vide -> on lit la version brute (raw).
+// Si rien n'est lisible, on lève une erreur AU LIEU de publier un fichier vide.
+async function lireTexteFichier(user, repo, fichier, fileMeta) {
+  if (fileMeta && fileMeta.content && fileMeta.content.trim().length > 0) {
+    return base64ToUtf8(fileMeta.content);
+  }
+  for (const branch of ['main','master']) {
+    try {
+      const r = await fetch(`https://raw.githubusercontent.com/${user}/${repo}/${branch}/${fichier}?t=`+Date.now(), {cache:'no-store'});
+      if (r.ok) { const t = await r.text(); if (t && t.length > 100) return t; }
+    } catch(e){}
+  }
+  throw new Error(`Lecture impossible de ${fichier} (contenu vide via l'API — fichier peut-être > 1 Mo — et version brute inaccessible). Publication annulée pour ne pas écraser le fichier par du vide.`);
+}
+
 async function githubPutFile(token, user, repo, fichier, contenu, sha) {
+  if (!contenu || contenu.length < 5000) {
+    throw new Error(`Contenu anormalement court pour ${fichier} (${contenu?contenu.length:0} caractères) — publication annulée pour éviter d'écraser le fichier par du vide.`);
+  }
   const url = `https://api.github.com/repos/${user}/${repo}/contents/${fichier}`;
   const body = {
     message: `MAJ résultats ${new Date().toLocaleTimeString('fr-FR')}`,
@@ -696,7 +715,7 @@ async function publierSurGithub() {
     updateStep('prov-read', '✅', `${FICHIERS.prov} lu`, 'done');
 
     updateStep('prov-write', '<span class="spinner">⏳</span>', `Mise à jour de ${FICHIERS.prov}...`, 'running');
-    const provContenu = base64ToUtf8(provFile.content);
+    const provContenu = await lireTexteFichier(user, repoProv, FICHIERS.prov, provFile);
     const provNew = injecterHTML(provContenu, js);
     const provResult = await githubPutFile(token, user, repoProv, FICHIERS.prov, provNew, provFile.sha);
     if (!provResult || !provResult.content || !provResult.content.sha) throw new Error(`${FICHIERS.prov} : la réponse de GitHub est incomplète, vérifie manuellement sur GitHub.`);
@@ -708,7 +727,7 @@ async function publierSurGithub() {
     updateStep('cong-read', '✅', `${FICHIERS.cong} lu`, 'done');
 
     updateStep('cong-write', '<span class="spinner">⏳</span>', `Mise à jour de ${FICHIERS.cong}...`, 'running');
-    const congContenu = base64ToUtf8(congFile.content);
+    const congContenu = await lireTexteFichier(user, repoCong, FICHIERS.cong, congFile);
     const congNew = injecterHTML(congContenu, js);
     const congResult = await githubPutFile(token, user, repoCong, FICHIERS.cong, congNew, congFile.sha);
     if (!congResult || !congResult.content || !congResult.content.sha) throw new Error(`${FICHIERS.cong} : la réponse de GitHub est incomplète, vérifie manuellement sur GitHub.`);
