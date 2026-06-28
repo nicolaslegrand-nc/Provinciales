@@ -112,81 +112,13 @@
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
 var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
-var PARTICIPATION={"sud":0,"nord":0,"iles":54.21833982076581};
-var EXPRIMES={sud:0,nord:0,iles:11979};
-var SIEGES_OVERRIDE={
-  'sud':{
-    'Les Loyalistes - le Rassemblement': 0,
-    'Nous, Réunis !': 0,
-    'Un espoir pour demain': 0,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 0,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 0,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 0
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 6,
-    'PALIKA Îles': 2,
-    'Nation Autochtone': 6,
-    'Union pour construire dans le consensus': 0,
-    'S\'engager et oeuvrer pour la prospérité': 0,
-    'Baselaia': 0,
-    'Un nouveau souffle': 0
-  }
-};
-
-
-
-
-
+var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
+var EXPRIMES={sud:0,nord:0,iles:0};
 var VOIX_DATA={
-  'sud':{
-    'Les Loyalistes - le Rassemblement': 0,
-    'Nous, Réunis !': 0,
-    'Un espoir pour demain': 0,
-    'Pour une Calédonie française': 0,
-    'Unis pour le pays': 0,
-    'France-Calédonie : une patrie': 0,
-    'Kanaky pour tous': 0,
-    'Faire Pays': 0,
-    'Souveraineté Kanaky NC': 0,
-    'Une province pour tous': 0,
-    'Un autre monde est possible !': 0
-  },
-  'nord':{
-    'UC-FLNKS': 0,
-    'UNI': 0,
-    'Alternative Nord pour un pays souverain': 0,
-    'Faire Pays': 0,
-    'Agissons ensemble pour le Nord': 0
-  },
-  'iles':{
-    'UC-FLNKS Îles': 3946,
-    'PALIKA Îles': 2481,
-    'Nation Autochtone': 3855,
-    'Union pour construire dans le consensus': 1165,
-    'S\'engager et oeuvrer pour la prospérité': 125,
-    'Baselaia': 137,
-    'Un nouveau souffle': 270
-  }
+  'sud':{'Les Loyalistes - le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
+  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
+  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
 };
-
-
-
-
-
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:127474,nord:43016,iles:22094};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -255,7 +187,17 @@ function calcAll(prov){
   var seuil=Math.ceil(INSCRITS[prov]*0.05),voix=VOIX_DATA[prov],elig={};
   Object.keys(voix).forEach(function(k){if(voix[k]>=seuil)elig[k]=voix[k];});
   var ok=Object.keys(elig).length>0;
-  return{prov:ok?repartir(elig,TOTAL_PROV[prov]):{},cong:ok?repartir(elig,TOTAL_CONG[prov]):{}};
+  var provSeats=ok?repartir(elig,TOTAL_PROV[prov]):{};
+  // Sièges forcés/validés à la saisie : ils priment sur le calcul automatique
+  if(typeof SIEGES_OVERRIDE!=='undefined' && SIEGES_OVERRIDE[prov]){
+    var ov=SIEGES_OVERRIDE[prov],sum=0;
+    Object.keys(ov).forEach(function(k){sum+=(parseInt(ov[k])||0);});
+    if(sum>0){
+      provSeats={};
+      Object.keys(ov).forEach(function(k){var v=parseInt(ov[k])||0;if(v>0)provSeats[k]=v;});
+    }
+  }
+  return{prov:provSeats,cong:ok?repartir(elig,TOTAL_CONG[prov]):{}};
 }
 
 // ═══ INVERSION NOM ═══
