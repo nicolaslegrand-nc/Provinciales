@@ -112,13 +112,71 @@
 <script>
 // ═══ CONFIG — mise à jour par l'interface de saisie ═══
 var PROVINCES_VISIBLES={sud:false,nord:false,iles:false};
-var PARTICIPATION={sud:0.0,nord:0.0,iles:0.0};
-var EXPRIMES={sud:0,nord:0,iles:0};
-var VOIX_DATA={
-  'sud':{'Les Loyalistes - le Rassemblement':0,'Nous, Réunis !':0,'Un espoir pour demain':0,'Pour une Calédonie française':0,'Unis pour le pays':0,'France-Calédonie : une patrie':0,'Kanaky pour tous':0,'Faire Pays':0,'Souveraineté Kanaky NC':0,'Une province pour tous':0,'Un autre monde est possible !':0},
-  'nord':{'UC-FLNKS':0,'UNI':0,'Alternative Nord pour un pays souverain':0,'Faire Pays':0,'Agissons ensemble pour le Nord':0},
-  'iles':{'UC-FLNKS Îles':0,'PALIKA Îles':0,'Nation Autochtone':0,'Union pour construire dans le consensus':0,"S'engager et oeuvrer pour la prospérité":0,'Baselaia':0,'Un nouveau souffle':0}
+var PARTICIPATION={"sud":64.60925365172507,"nord":0,"iles":54.21833982076581};
+var EXPRIMES={sud:82360,nord:0,iles:11979};
+var SIEGES_OVERRIDE={
+  'sud':{
+    'Les Loyalistes - le Rassemblement': 27,
+    'Nous, Réunis !': 0,
+    'Un espoir pour demain': 0,
+    'Pour une Calédonie française': 0,
+    'Unis pour le pays': 0,
+    'France-Calédonie : une patrie': 0,
+    'Kanaky pour tous': 8,
+    'Faire Pays': 0,
+    'Souveraineté Kanaky NC': 0,
+    'Une province pour tous': 0,
+    'Un autre monde est possible !': 5
+  },
+  'nord':{
+    'UC-FLNKS': 0,
+    'UNI': 0,
+    'Alternative Nord pour un pays souverain': 0,
+    'Faire Pays': 0,
+    'Agissons ensemble pour le Nord': 0
+  },
+  'iles':{
+    'UC-FLNKS Îles': 6,
+    'PALIKA Îles': 2,
+    'Nation Autochtone': 6,
+    'Union pour construire dans le consensus': 0,
+    'S\'engager et oeuvrer pour la prospérité': 0,
+    'Baselaia': 0,
+    'Un nouveau souffle': 0
+  }
 };
+var VOIX_DATA={
+  'sud':{
+    'Les Loyalistes - le Rassemblement': 41294,
+    'Nous, Réunis !': 4554,
+    'Un espoir pour demain': 1520,
+    'Pour une Calédonie française': 1158,
+    'Unis pour le pays': 3401,
+    'France-Calédonie : une patrie': 727,
+    'Kanaky pour tous': 12842,
+    'Faire Pays': 3575,
+    'Souveraineté Kanaky NC': 1003,
+    'Une province pour tous': 3887,
+    'Un autre monde est possible !': 8399
+  },
+  'nord':{
+    'UC-FLNKS': 0,
+    'UNI': 0,
+    'Alternative Nord pour un pays souverain': 0,
+    'Faire Pays': 0,
+    'Agissons ensemble pour le Nord': 0
+  },
+  'iles':{
+    'UC-FLNKS Îles': 3946,
+    'PALIKA Îles': 2481,
+    'Nation Autochtone': 3855,
+    'Union pour construire dans le consensus': 1165,
+    'S\'engager et oeuvrer pour la prospérité': 125,
+    'Baselaia': 137,
+    'Un nouveau souffle': 270
+  }
+};
+
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:127474,nord:43016,iles:22094};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
