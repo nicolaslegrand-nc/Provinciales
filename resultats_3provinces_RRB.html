@@ -145,11 +145,6 @@ var SIEGES_OVERRIDE={
     'Un nouveau souffle': 0
   }
 };
-
-
-
-
-
 var VOIX_DATA={
   'sud':{
     'Les Loyalistes - le Rassemblement': 41294,
@@ -181,12 +176,6 @@ var VOIX_DATA={
     'Un nouveau souffle': 270
   }
 };
-
-
-
-
-
-
 // ═══ DONNÉES STATIQUES ═══
 var INSCRITS={sud:127474,nord:43016,iles:22094};
 var TOTAL_PROV={sud:40,nord:22,iles:14};
@@ -414,9 +403,8 @@ function renderSVG(prov){
 
 function renderLegende(prov){
   var res=calcAll(prov),sp=res.prov,sc=res.cong,seuil=Math.ceil(INSCRITS[prov]*0.05);
-  var av=ORDRE[prov].filter(function(n){return (sp[n]||0)>0;}).sort(function(a,b){return (sp[b]||0)-(sp[a]||0);});
-  var sa=ORDRE[prov].filter(function(n){return (sp[n]||0)===0;});
-  var all=av.concat(sa),h='';
+  // Tri des listes par nombre de suffrages (voix) décroissant
+  var all=ORDRE[prov].slice().sort(function(a,b){return (VOIX_DATA[prov][b]||0)-(VOIX_DATA[prov][a]||0);}),h='';
   all.forEach(function(nom,idx){
     var sv=sp[nom]||0,nc=sc[nom]||0,v=VOIX_DATA[prov][nom]||0;
     var col=COULEURS[prov][nom]||'#999',head=TETES[prov][nom]||'',uid=prov+'_'+idx;
