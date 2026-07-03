@@ -218,6 +218,7 @@ function render(){
   document.getElementById('pans').innerHTML=PROVS.map(panel).join('');
   refreshOut();
 }
+function vpRole(i,genre){var f=(genre==='F');return (i===0?(f?'1ère':'1er'):(i+1)+'ème')+' '+(f?'vice-présidente':'vice-président');}
 function panel(prov){
   var st=ST[prov];
   var h='<div class="pan'+(prov==='sud'?' active':'')+'" id="pan-'+prov+'">';
@@ -243,7 +244,7 @@ function panel(prov){
       +'<div class="file"><label>Photo (optionnelle) </label> <input type="file" accept="image/*" onchange="onPhoto(\''+prov+'\',\'vp\','+i+',this)"> '
       +'<button class="btn btn-del" onclick="delVp(\''+prov+'\','+i+')">Retirer</button></div></div>'
       +'<div class="prev">'+medHTML(prov,vv?vv.liste:'',vv?vv.nom:'',vp.photo)
-      +'<div class="rl">'+(vp.genre==='F'?'Vice-présidente':'Vice-président')+'</div></div>'
+      +'<div class="rl">'+vpRole(i,vp.genre)+'</div></div>'
       +'</div></div>';
   });
   h+='<div class="actions"><button class="btn btn-add" onclick="addVp(\''+prov+'\')">+ Ajouter un vice-président</button></div>';
@@ -282,7 +283,7 @@ function cropSquare(file,cb){
     var side=Math.min(img.width,img.height),sx=(img.width-side)/2,sy=(img.height-side)/2;
     var S=220,c=document.createElement('canvas');c.width=S;c.height=S;
     c.getContext('2d').drawImage(img,sx,sy,side,side,0,0,S,S);
-    cb(c.toDataURL('image/png'));
+    cb(c.toDataURL('image/jpeg',0.82));
   };img.src=URL.createObjectURL(file);
 }
 
